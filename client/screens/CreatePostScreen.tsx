@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import {
   StyleSheet,
   View,
-  TextInput,
   Pressable,
   ScrollView,
   Alert,
@@ -19,6 +18,7 @@ import { StarRating } from "@/components/StarRating";
 import { MediaTypeBadge, MediaType } from "@/components/MediaTypeBadge";
 import { useTheme } from "@/hooks/useTheme";
 import { Spacing, BorderRadius } from "@/constants/theme";
+import { TextInput } from "@/components/TextInput";
 
 type MediaTypeOption = "film" | "series" | "music" | "anime" | "manga" | "book";
 
@@ -168,24 +168,12 @@ export default function CreatePostScreen() {
             >
               Search for media
             </ThemedText>
-            <View
-              style={[
-                styles.searchBar,
-                {
-                  backgroundColor: theme.backgroundDefault,
-                  borderColor: theme.border,
-                },
-              ]}
-            >
-              <Feather name="search" size={20} color={theme.textSecondary} />
-              <TextInput
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-                placeholder="Search..."
-                placeholderTextColor={theme.textSecondary}
-                style={[styles.searchInput, { color: theme.text }]}
-              />
-            </View>
+            <TextInput
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              placeholder="Search..."
+              icon={<Feather name="search" size={20} color={theme.textSecondary} />}
+            />
 
             {searchResults.map((result) => (
               <Pressable

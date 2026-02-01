@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import {
   StyleSheet,
   View,
-  TextInput,
   Pressable,
   Image,
   Alert,
@@ -21,6 +20,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { useAuth } from "@/contexts/AuthContext";
 import { Spacing, BorderRadius } from "@/constants/theme";
 import { AuthStackParamList } from "@/navigation/AuthStackNavigator";
+import { TextInput } from "@/components/TextInput";
 
 export default function SignUpScreen() {
   const insets = useSafeAreaInsets();
@@ -96,101 +96,55 @@ export default function SignUpScreen() {
         </ThemedText>
 
         <View style={styles.inputContainer}>
-          <View
-            style={[
-              styles.inputWrapper,
-              {
-                backgroundColor: theme.backgroundSecondary,
-                borderColor: theme.border,
-              },
-            ]}
-          >
-            <Feather name="user" size={20} color={theme.textSecondary} />
-            <TextInput
-              value={name}
-              onChangeText={setName}
-              placeholder="Full Name"
-              placeholderTextColor={theme.textSecondary}
-              style={[styles.input, { color: theme.text }]}
-              autoCapitalize="words"
-              testID="input-name"
-            />
-          </View>
+          <TextInput
+            value={name}
+            onChangeText={setName}
+            placeholder="Full Name"
+            icon={<Feather name="user" size={20} color={theme.textSecondary} />}
+            autoCapitalize="words"
+            testID="input-name"
+          />
 
-          <View
-            style={[
-              styles.inputWrapper,
-              {
-                backgroundColor: theme.backgroundSecondary,
-                borderColor: theme.border,
-              },
-            ]}
-          >
-            <Feather name="mail" size={20} color={theme.textSecondary} />
-            <TextInput
-              value={email}
-              onChangeText={setEmail}
-              placeholder="Email"
-              placeholderTextColor={theme.textSecondary}
-              style={[styles.input, { color: theme.text }]}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoCorrect={false}
-              testID="input-email"
-            />
-          </View>
+          <TextInput
+            value={email}
+            onChangeText={setEmail}
+            placeholder="Email"
+            icon={<Feather name="mail" size={20} color={theme.textSecondary} />}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            autoCorrect={false}
+            testID="input-email"
+          />
 
-          <View
-            style={[
-              styles.inputWrapper,
-              {
-                backgroundColor: theme.backgroundSecondary,
-                borderColor: theme.border,
-              },
-            ]}
-          >
-            <Feather name="lock" size={20} color={theme.textSecondary} />
-            <TextInput
-              value={password}
-              onChangeText={setPassword}
-              placeholder="Password (min 6 characters)"
-              placeholderTextColor={theme.textSecondary}
-              style={[styles.input, { color: theme.text }]}
-              secureTextEntry={!showPassword}
-              testID="input-password"
-            />
-            <Pressable
-              onPress={() => setShowPassword(!showPassword)}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            >
-              <Feather
-                name={showPassword ? "eye-off" : "eye"}
-                size={20}
-                color={theme.textSecondary}
-              />
-            </Pressable>
-          </View>
+          <TextInput
+            value={password}
+            onChangeText={setPassword}
+            placeholder="Password (min 6 characters)"
+            icon={<Feather name="lock" size={20} color={theme.textSecondary} />}
+            secureTextEntry={!showPassword}
+            testID="input-password"
+            rightElement={
+              <Pressable
+                onPress={() => setShowPassword(!showPassword)}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              >
+                <Feather
+                  name={showPassword ? "eye-off" : "eye"}
+                  size={20}
+                  color={theme.textSecondary}
+                />
+              </Pressable>
+            }
+          />
 
-          <View
-            style={[
-              styles.inputWrapper,
-              {
-                backgroundColor: theme.backgroundSecondary,
-                borderColor: theme.border,
-              },
-            ]}
-          >
-            <Feather name="check-circle" size={20} color={theme.textSecondary} />
-            <TextInput
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-              placeholder="Confirm Password"
-              placeholderTextColor={theme.textSecondary}
-              style={[styles.input, { color: theme.text }]}
-              secureTextEntry={!showPassword}
-              testID="input-confirm-password"
-            />
-          </View>
+          <TextInput
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            placeholder="Confirm Password"
+            icon={<Feather name="check-circle" size={20} color={theme.textSecondary} />}
+            secureTextEntry={!showPassword}
+            testID="input-confirm-password"
+          />
         </View>
 
         <View style={styles.termsContainer}>

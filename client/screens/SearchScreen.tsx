@@ -3,7 +3,6 @@ import {
   StyleSheet,
   View,
   FlatList,
-  TextInput,
   Pressable,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -15,6 +14,7 @@ import { MediaCard } from "@/components/MediaCard";
 import { EmptyState } from "@/components/EmptyState";
 import { useTheme } from "@/hooks/useTheme";
 import { Spacing, BorderRadius } from "@/constants/theme";
+import { TextInput } from "@/components/TextInput";
 
 type MediaType = "all" | "film" | "series" | "music" | "anime" | "manga" | "book";
 
@@ -67,7 +67,7 @@ export default function SearchScreen() {
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
   const { theme } = useTheme();
-  const inputRef = useRef<TextInput>(null);
+  const inputRef = useRef<any>(null);
   const [query, setQuery] = useState("");
   const [selectedFilter, setSelectedFilter] = useState<MediaType>("all");
   const [hasSearched, setHasSearched] = useState(false);
@@ -126,33 +126,23 @@ export default function SearchScreen() {
           },
         ]}
       >
-        <View
-          style={[
-            styles.searchBar,
-            {
-              backgroundColor: theme.backgroundDefault,
-              borderColor: theme.border,
-            },
-          ]}
-        >
-          <Feather name="search" size={20} color={theme.textSecondary} />
-          <TextInput
-            ref={inputRef}
-            value={query}
-            onChangeText={setQuery}
-            onSubmitEditing={handleSearch}
-            placeholder="Search..."
-            placeholderTextColor={theme.textSecondary}
-            style={[styles.input, { color: theme.text }]}
-            autoFocus
-            returnKeyType="search"
-          />
-          {query.length > 0 ? (
-            <Pressable onPress={() => setQuery("")}>
-              <Feather name="x" size={20} color={theme.textSecondary} />
-            </Pressable>
-          ) : null}
-        </View>
+        <TextInput
+          ref={inputRef}
+          value={query}
+          onChangeText={setQuery}
+          onSubmitEditing={handleSearch}
+          placeholder="Search..."
+          icon={<Feather name="search" size={20} color={theme.textSecondary} />}
+          autoFocus
+          returnKeyType="search"
+          rightElement={
+            query.length > 0 ? (
+              <Pressable onPress={() => setQuery("")}>
+                <Feather name="x" size={20} color={theme.textSecondary} />
+              </Pressable>
+            ) : undefined
+          }
+        />
 
         <View style={styles.filters}>
           {FILTERS.map((filter) => (
