@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, forwardRef } from "react";
 import {
   StyleSheet,
   View,
@@ -14,73 +14,69 @@ interface CustomTextInputProps extends TextInputProps {
   rightElement?: React.ReactNode;
 }
 
-export function TextInput({
-  icon,
-  rightElement,
-  style,
-  onFocus,
-  onBlur,
-  ...props
-}: CustomTextInputProps) {
-  const { theme } = useTheme();
-  const [isFocused, setIsFocused] = useState(false);
-  const [focusAnim] = useState(new Animated.Value(0));
+export const TextInput = forwardRef<RNTextInput, CustomTextInputProps>(
+  ({ icon, rightElement, style, onFocus, onBlur, ...props }, ref) => {
+    const { theme } = useTheme();
+    const [isFocused, setIsFocused] = useState(false);
+    const [focusAnim] = useState(new Animated.Value(0));
 
-  const handleFocus = (e: any) => {
-    setIsFocused(true);
-    Animated.timing(focusAnim, {
-      toValue: 1,
-      duration: 200,
-      useNativeDriver: false,
-    }).start();
-    onFocus?.(e);
-  };
+    const handleFocus = (e: any) => {
+      setIsFocused(true);
+      Animated.timing(focusAnim, {
+        toValue: 1,
+        duration: 200,
+        useNativeDriver: false,
+      }).start();
+      onFocus?.(e);
+    };
 
-  const handleBlur = (e: any) => {
-    setIsFocused(false);
-    Animated.timing(focusAnim, {
-      toValue: 0,
-      duration: 200,
-      useNativeDriver: false,
-    }).start();
-    onBlur?.(e);
-  };
+    const handleBlur = (e: any) => {
+      setIsFocused(false);
+      Animated.timing(focusAnim, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: false,
+      }).start();
+      onBlur?.(e);
+    };
 
-  const underlineWidth = focusAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ["0%", "100%"],
-  });
+    const underlineWidth = focusAnim.interpolate({
+      inputRange: [0, 1],
+      outputRange: ["0%", "100%"],
+    });
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.inputWrapper}>
-        {icon && <View style={styles.iconContainer}>{icon}</View>}
-        <RNTextInput
+    return (
+      <View style={styles.container}>
+        <View style={styles.inputWrapper}>
+          {icon && <View style={styles.iconContainer}>{icon}</View>}
+          <RNTextInput
+            ref={ref}
+            style={[
+              styles.input,
+              { color: theme.text },
+              style,
+            ]}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            placeholderTextColor={theme.textSecondary}
+            {...props}
+          />
+          {rightElement && <View style={styles.rightElement}>{rightElement}</View>}
+        </View>
+        <View style={[styles.underlineBase, { backgroundColor: theme.border }]} />
+        <Animated.View
           style={[
-            styles.input,
-            { color: theme.text },
-            style,
+            styles.underlineActive,
+            {
+              backgroundColor: theme.accent,
+              width: underlineWidth,
+            },
           ]}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-          placeholderTextColor={theme.textSecondary}
-          {...props}
         />
-        {rightElement && <View style={styles.rightElement}>{rightElement}</View>}
       </View>
-      <View style={[styles.underlineBase, { backgroundColor: theme.border }]} />
-      <Animated.View
-        style={[
-          styles.underlineActive,
-          {
-            backgroundColor: theme.accent,
-            width: underlineWidth,
-          },
-        ]}
-      />
-    </View>
-  );
-}
+    );
+  }
+);
 
 const styles = StyleSheet.create({
   container: {

@@ -4,6 +4,7 @@ import {
   View,
   FlatList,
   Pressable,
+  TextInput as RNTextInput,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
@@ -67,7 +68,7 @@ export default function SearchScreen() {
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
   const { theme } = useTheme();
-  const inputRef = useRef<any>(null);
+  const inputRef = useRef<RNTextInput>(null);
   const [query, setQuery] = useState("");
   const [selectedFilter, setSelectedFilter] = useState<MediaType>("all");
   const [hasSearched, setHasSearched] = useState(false);
