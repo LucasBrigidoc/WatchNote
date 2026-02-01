@@ -218,6 +218,7 @@ export default function ProfileScreen() {
     }
   };
 
+  return (
     <View style={[styles.container, { backgroundColor: theme.backgroundRoot }]}>
       <View style={[styles.settingsButtonWrapper, { top: insets.top + Spacing.md }]}>
         <Pressable
@@ -242,68 +243,69 @@ export default function ProfileScreen() {
         scrollIndicatorInsets={{ bottom: insets.bottom }}
         showsVerticalScrollIndicator={false}
       >
-      <View style={styles.header}>
-        <Avatar size={80} src={avatarUrl} />
-        <ThemedText type="h3" style={styles.name}>
-          {name}
-        </ThemedText>
-        <ThemedText
-          type="small"
-          style={[styles.bio, { color: theme.textSecondary }]}
-        >
-          {bio}
-        </ThemedText>
-
-        <View style={styles.stats}>
-          <StatCard value={0} label="Reviews" />
-          <StatCard value={0} label="Ratings" />
-          <StatCard value={0} label="Followers" />
-        </View>
-
-        <Pressable
-          style={[
-            styles.editButton,
-            {
-              backgroundColor: theme.backgroundDefault,
-              borderColor: theme.border,
-            },
-          ]}
-        >
-          <ThemedText type="body" style={{ fontWeight: "600" }}>
-            Edit Profile
+        <View style={styles.header}>
+          <Avatar size={80} src={avatarUrl} />
+          <ThemedText type="h3" style={styles.name}>
+            {name}
           </ThemedText>
-        </Pressable>
-      </View>
+          <ThemedText
+            type="small"
+            style={[styles.bio, { color: theme.textSecondary }]}
+          >
+            {bio}
+          </ThemedText>
 
-      <View style={styles.tabs}>
-        {TABS.map((tab) => (
+          <View style={styles.stats}>
+            <StatCard value={0} label="Reviews" />
+            <StatCard value={0} label="Ratings" />
+            <StatCard value={0} label="Followers" />
+          </View>
+
           <Pressable
-            key={tab.key}
-            onPress={() => setActiveTab(tab.key)}
             style={[
-              styles.tab,
-              activeTab === tab.key && {
-                borderBottomColor: theme.accent,
-                borderBottomWidth: 2,
+              styles.editButton,
+              {
+                backgroundColor: theme.backgroundDefault,
+                borderColor: theme.border,
               },
             ]}
           >
-            <ThemedText
-              type="body"
-              style={{
-                color:
-                  activeTab === tab.key ? theme.text : theme.textSecondary,
-                fontWeight: activeTab === tab.key ? "600" : "400",
-              }}
-            >
-              {tab.label}
+            <ThemedText type="body" style={{ fontWeight: "600" }}>
+              Edit Profile
             </ThemedText>
           </Pressable>
-        ))}
-      </View>
+        </View>
 
-      {renderTabContent()}
-    </ScrollView>
+        <View style={styles.tabs}>
+          {TABS.map((tab) => (
+            <Pressable
+              key={tab.key}
+              onPress={() => setActiveTab(tab.key)}
+              style={[
+                styles.tab,
+                activeTab === tab.key && {
+                  borderBottomColor: theme.accent,
+                  borderBottomWidth: 2,
+                },
+              ]}
+            >
+              <ThemedText
+                type="body"
+                style={{
+                  color:
+                    activeTab === tab.key ? theme.text : theme.textSecondary,
+                  fontWeight: activeTab === tab.key ? "600" : "400",
+                }}
+              >
+                {tab.label}
+              </ThemedText>
+            </Pressable>
+          ))}
+        </View>
+
+        {renderTabContent()}
+      </ScrollView>
+    </View>
   );
 }
 
