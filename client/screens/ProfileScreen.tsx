@@ -220,23 +220,12 @@ export default function ProfileScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.backgroundRoot }]}>
-      <View style={[styles.settingsButtonWrapper, { top: insets.top + Spacing.md }]}>
-        <Pressable
-          style={[
-            styles.iconButton,
-            { backgroundColor: "rgba(255,255,255,0.05)" },
-          ]}
-        >
-          <Feather name="settings" size={20} color={theme.text} />
-        </Pressable>
-      </View>
-
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={[
           styles.content,
           {
-            paddingTop: insets.top + Spacing["4xl"],
+            paddingTop: insets.top + Spacing.xl,
             paddingBottom: tabBarHeight + Spacing.xl,
           },
         ]}
@@ -312,18 +301,6 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  settingsButtonWrapper: {
-    position: "absolute",
-    right: Spacing.lg,
-    zIndex: 10,
-  },
-  iconButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: "center",
-    justifyContent: "center",
   },
   scrollView: {
     flex: 1,
