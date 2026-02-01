@@ -15,6 +15,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { GlassCard } from "@/components/GlassCard";
 import { Avatar } from "@/components/Avatar";
 import { useTheme } from "@/hooks/useTheme";
+import { useAuth } from "@/contexts/AuthContext";
 import { Spacing, BorderRadius } from "@/constants/theme";
 
 interface SettingRowProps {
@@ -82,12 +83,13 @@ export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
   const { theme } = useTheme();
+  const { user, logout } = useAuth();
   const [notifications, setNotifications] = useState(true);
 
   const handleLogout = () => {
     Alert.alert("Log Out", "Are you sure you want to log out?", [
       { text: "Cancel", style: "cancel" },
-      { text: "Log Out", style: "destructive", onPress: () => {} },
+      { text: "Log Out", style: "destructive", onPress: logout },
     ]);
   };
 
@@ -106,7 +108,7 @@ export default function SettingsScreen() {
               'Type "DELETE" to confirm account deletion.',
               [
                 { text: "Cancel", style: "cancel" },
-                { text: "I understand", style: "destructive" },
+                { text: "I understand", style: "destructive", onPress: logout },
               ]
             );
           },
@@ -129,12 +131,12 @@ export default function SettingsScreen() {
       <GlassCard style={styles.profileCard}>
         <Avatar size={64} />
         <View style={styles.profileInfo}>
-          <ThemedText type="h4">Lucas Brigido</ThemedText>
+          <ThemedText type="h4">{user?.name || "User"}</ThemedText>
           <ThemedText
             type="small"
             style={{ color: theme.textSecondary }}
           >
-            lucas@example.com
+            {user?.email || "user@example.com"}
           </ThemedText>
         </View>
         <Feather name="chevron-right" size={20} color={theme.textSecondary} />
