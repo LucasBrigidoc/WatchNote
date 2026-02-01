@@ -216,42 +216,6 @@ export default function SignUpScreen() {
         >
           {isLoading ? "Creating account..." : "Create Account"}
         </Button>
-
-        <View style={styles.divider}>
-          <View style={[styles.dividerLine, { backgroundColor: theme.border }]} />
-          <ThemedText
-            type="small"
-            style={[styles.dividerText, { color: theme.textSecondary }]}
-          >
-            or sign up with
-          </ThemedText>
-          <View style={[styles.dividerLine, { backgroundColor: theme.border }]} />
-        </View>
-
-        <View style={styles.socialButtons}>
-          <Pressable
-            style={[
-              styles.socialButton,
-              {
-                backgroundColor: theme.backgroundSecondary,
-                borderColor: theme.border,
-              },
-            ]}
-          >
-            <Feather name="github" size={22} color={theme.text} />
-          </Pressable>
-          <Pressable
-            style={[
-              styles.socialButton,
-              {
-                backgroundColor: theme.backgroundSecondary,
-                borderColor: theme.border,
-              },
-            ]}
-          >
-            <Feather name="twitter" size={22} color={theme.text} />
-          </Pressable>
-        </View>
       </GlassCard>
 
       <View style={styles.footer}>
@@ -322,32 +286,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   signUpButton: {
-    marginBottom: Spacing.xl,
-  },
-  divider: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: Spacing.xl,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-  },
-  dividerText: {
-    marginHorizontal: Spacing.md,
-  },
-  socialButtons: {
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: Spacing.md,
-  },
-  socialButton: {
-    width: 56,
-    height: 56,
-    borderRadius: BorderRadius.lg,
-    borderWidth: 1,
-    alignItems: "center",
-    justifyContent: "center",
+    marginBottom: Spacing.md,
   },
   footer: {
     flexDirection: "row",
