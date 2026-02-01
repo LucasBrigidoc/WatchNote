@@ -49,7 +49,10 @@ export default function SearchScreen() {
 
     setLoading(true);
     try {
-      const response = await fetch(`/api/movies/search?q=${encodeURIComponent(searchQuery)}`);
+      const domain = process.env.EXPO_PUBLIC_DOMAIN || window.location.host;
+      const protocol = window.location.protocol;
+      const baseUrl = `${protocol}//${domain}`;
+      const response = await fetch(`${baseUrl}/api/movies/search?q=${encodeURIComponent(searchQuery)}`);
       const data = await response.json();
       
       if (data.results) {
