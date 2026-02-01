@@ -1,0 +1,207 @@
+ATUE COMO UM DESENVOLVEDOR FULL STACK SÊNIOR, PRODUCT DESIGNER E ARQUITETO DE SOFTWARE.
+
+OBJETIVO:
+Criar um MVP funcional de um aplicativo estilo Letterboxd, porém MULTIMÍDIA e SOCIAL, onde usuários podem registrar, avaliar e comentar conteúdos culturais e organizar sua identidade cultural em um único perfil.
+
+O aplicativo deve reunir:
+- Filmes
+- Séries
+- Músicas (álbuns e faixas)
+- Animes
+- Mangás
+- Livros
+
+O MVP deve ter:
+- Feed social na Home
+- Sistema de posts e comentários
+- Novidades automáticas
+- Perfil do usuário como centro da organização
+- Listas personalizadas dentro do perfil
+
+------------------------------------------------------------------
+IDEIA DO APLICATIVO (VISÃO GERAL):
+
+O app é um HUB CULTURAL SOCIAL onde:
+- O usuário descobre lançamentos
+- Registra o que consome
+- Avalia e comenta
+- Publica opiniões em formato de post
+- Organiza tudo dentro do seu PERFIL CULTURAL
+
+O perfil do usuário funciona como um “portfólio cultural”.
+
+------------------------------------------------------------------
+FUNCIONALIDADES PRINCIPAIS DO MVP:
+
+1. AUTENTICAÇÃO
+- Login com email e senha
+- Sessão persistente
+- Perfil único por usuário
+
+2. HOME (FEED)
+A Home deve conter:
+
+A) FEED DE NOVIDADES (POSTS DO SISTEMA)
+- Lançamentos recentes de:
+  - Filmes e séries (TMDB)
+  - Álbuns musicais (Spotify)
+  - Animes (Jikan)
+  - Livros (Google Books)
+- Cada novidade funciona como um post:
+  - Pode receber comentários
+  - Pode receber avaliações
+
+B) FEED DE POSTS DE USUÁRIOS
+- Avaliações recentes publicadas por usuários
+- Cada post contém:
+  - Usuário
+  - Mídia
+  - Nota
+  - Comentário
+  - Data
+
+C) INTERAÇÃO
+- Comentar posts
+- Curtir (opcional no MVP)
+
+D) BOTÃO “CRIAR POST”
+- Botão flutuante fixo na Home
+- Permite publicar avaliação/opinião
+
+3. CRIAR POST
+Fluxo:
+- Selecionar tipo de mídia
+- Buscar conteúdo via API
+- Atribuir nota
+- Escrever comentário
+- Publicar no feed
+
+4. BUSCA GLOBAL
+- Barra de busca única
+- Filtro por tipo de mídia
+- Retorno das APIs externas
+
+5. TELA DE DETALHE DA MÍDIA
+Exibir:
+- Capa
+- Título
+- Descrição
+- Ano
+- Gêneros
+- Nota média da comunidade
+- Ações:
+  - Avaliar
+  - Comentar
+  - Criar post
+  - Marcar status (quero, consumindo, concluído)
+
+6. PERFIL DO USUÁRIO (CENTRAL DO APP)
+A tela de perfil deve conter SEÇÕES CLARAS:
+
+A) CABEÇALHO DO PERFIL
+- Foto
+- Nome
+- Bio curta
+- Estatísticas:
+  - Posts publicados
+  - Itens avaliados
+
+B) ABA / SEÇÃO: POSTS
+- Lista dos posts criados pelo usuário
+- Ordenação por data
+
+C) ABA / SEÇÃO: AVALIAÇÕES
+- Lista de mídias avaliadas
+- Nota atribuída
+
+D) ABA / SEÇÃO: LISTAS PERSONALIZADAS
+- Criar nova lista
+- Visualizar listas criadas
+- Cada lista pode conter qualquer tipo de mídia
+- Abrir lista para ver os itens
+
+E) ABA / SEÇÃO: STATUS DE CONSUMO
+- Itens marcados como:
+  - Quero consumir
+  - Consumindo
+  - Concluído
+
+7. LISTAS PERSONALIZADAS (DETALHE)
+- Nome
+- Descrição
+- Lista de itens
+- Opção de remover itens
+- Opção de excluir lista
+
+------------------------------------------------------------------
+MODELAGEM DE DADOS (MVP):
+
+Usuário:
+- id
+- nome
+- email
+- foto
+- bio
+
+Item:
+- id
+- tipo
+- titulo
+- imagem
+- descricao
+- ano
+- fonte_api
+
+Post:
+- id
+- usuario_id
+- item_id
+- nota
+- comentario
+- data
+
+Comentario:
+- id
+- post_id
+- usuario_id
+- texto
+- data
+
+Interacao:
+- usuario_id
+- item_id
+- status
+- nota
+
+Lista:
+- id
+- usuario_id
+- nome
+- descricao
+
+Lista_Item:
+- lista_id
+- item_id
+
+------------------------------------------------------------------
+APIS UTILIZADAS:
+
+1. FILMES E SÉRIES
+API: TMDB
+
+2. MÚSICA
+API: Spotify Web API
+
+3. ANIMES E MANGÁS
+API: Jikan API
+
+4. LIVROS
+API: Google Books API
+
+------------------------------------------------------------------
+REGRAS IMPORTANTES:
+
+- Perfil do usuário é o centro da experiência
+- Listas NÃO ficam em tela separada
+- Feed deve ser fluido e simples
+- Código organizado e comentado
