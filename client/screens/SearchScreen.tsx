@@ -49,9 +49,9 @@ export default function SearchScreen() {
 
     setLoading(true);
     try {
-      const domain = process.env.EXPO_PUBLIC_DOMAIN || window.location.host;
-      const protocol = window.location.protocol;
-      const baseUrl = `${protocol}//${domain}`;
+      const baseUrl = process.env.EXPO_PUBLIC_DOMAIN 
+        ? `https://${process.env.EXPO_PUBLIC_DOMAIN}` 
+        : "http://127.0.0.1:5000";
       
       // Busca Filmes e Séries (TMDB)
       const movieResponse = await fetch(`${baseUrl}/api/movies/search?q=${encodeURIComponent(searchQuery)}`);
