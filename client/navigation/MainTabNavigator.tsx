@@ -76,7 +76,7 @@ function TabBarWithFAB({
               <Pressable key={route.key} onPress={onPress} style={styles.tabItem}>
                 <Feather
                   name={route.name === "HomeTab" ? "home" : "compass"}
-                  size={24}
+                  size={26}
                   color={isFocused ? theme.accent : theme.tabIconDefault}
                 />
               </Pressable>
@@ -108,7 +108,7 @@ function TabBarWithFAB({
                 <Pressable onPress={onPress} style={styles.tabItem}>
                   <Feather
                     name="user"
-                    size={24}
+                    size={26}
                     color={isFocused ? theme.accent : theme.tabIconDefault}
                   />
                 </Pressable>
@@ -118,7 +118,7 @@ function TabBarWithFAB({
                 >
                   <Feather
                     name="settings"
-                    size={24}
+                    size={26}
                     color={theme.tabIconDefault}
                   />
                 </Pressable>
@@ -191,8 +191,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     height: 64,
     alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
+    justifyContent: "center",
+    paddingHorizontal: 10,
     position: "relative",
   },
   tabItem: {
@@ -202,9 +202,8 @@ const styles = StyleSheet.create({
     minHeight: 44,
   },
   fabContainer: {
-    position: "absolute",
-    left: "50%",
-    marginLeft: -19, // Half of 38px
+    position: "relative",
+    marginHorizontal: 20,
     alignItems: "center",
     justifyContent: "center",
     zIndex: 1,
@@ -212,13 +211,13 @@ const styles = StyleSheet.create({
   leftIcons: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 30,
+    gap: 20,
   },
   profileTabWrapper: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 15,
+    gap: 20,
   },
   settingsIcon: {
     // No extra margin needed with gap
