@@ -5,6 +5,7 @@ import {
   ScrollView,
   Pressable,
 } from "react-native";
+import { Image } from "expo-image";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
@@ -220,31 +221,39 @@ export default function ProfileScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.backgroundRoot }]}>
-      <View style={[styles.settingsButtonWrapper, { top: insets.top + Spacing.lg }]}>
-        <Pressable
-          style={[
-            styles.iconButton,
-            { backgroundColor: "rgba(255,255,255,0.08)" },
-          ]}
-        >
-          <Feather name="settings" size={24} color={theme.text} />
-        </Pressable>
-      </View>
-
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={[
           styles.content,
           {
-            paddingTop: insets.top + 80,
             paddingBottom: tabBarHeight + Spacing.xl,
           },
         ]}
         scrollIndicatorInsets={{ bottom: insets.bottom }}
         showsVerticalScrollIndicator={false}
       >
+        <View style={styles.bannerContainer}>
+          <Image
+            source={require("../../assets/images/profile-banner.jpg")}
+            style={styles.banner}
+            contentFit="cover"
+          />
+          <View style={[styles.settingsButtonWrapper, { top: insets.top + Spacing.md }]}>
+            <Pressable
+              style={[
+                styles.iconButton,
+                { backgroundColor: "rgba(0,0,0,0.5)" },
+              ]}
+            >
+              <Feather name="settings" size={20} color="#FFF" />
+            </Pressable>
+          </View>
+        </View>
+
         <View style={styles.header}>
-          <Avatar size={80} src={avatarUrl} />
+          <View style={styles.avatarWrapper}>
+            <Avatar size={80} uri={avatarUrl} />
+          </View>
           <ThemedText type="h3" style={styles.name}>
             {name}
           </ThemedText>
@@ -299,31 +308,44 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  bannerContainer: {
+    height: 160,
+    width: "100%",
+  },
+  banner: {
+    flex: 1,
+  },
   settingsButtonWrapper: {
     position: "absolute",
-    right: 32,
+    right: Spacing.md,
     zIndex: 10,
   },
   iconButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "rgba(255,255,255,0.1)",
   },
   scrollView: {
     flex: 1,
   },
   content: {
-    paddingHorizontal: Spacing.lg,
+    // No paddingHorizontal here as banner is full width
   },
   header: {
     alignItems: "center",
+    paddingHorizontal: Spacing.lg,
+    marginTop: -40, // Pull up to overlap banner
     marginBottom: Spacing["2xl"],
   },
+  avatarWrapper: {
+    borderWidth: 4,
+    borderColor: "#0D0D0D",
+    borderRadius: 50,
+  },
   name: {
-    marginTop: Spacing.md,
+    marginTop: Spacing.sm,
   },
   bio: {
     marginTop: Spacing.xs,
@@ -335,6 +357,7 @@ const styles = StyleSheet.create({
   },
   tabs: {
     flexDirection: "row",
+    paddingHorizontal: Spacing.lg,
     borderBottomWidth: 1,
     borderBottomColor: "rgba(255,255,255,0.1)",
     marginBottom: Spacing.lg,
@@ -346,11 +369,13 @@ const styles = StyleSheet.create({
   },
   tabContent: {
     flex: 1,
+    paddingHorizontal: Spacing.lg,
   },
   reviewsGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
     gap: Spacing.md,
+    paddingHorizontal: Spacing.lg,
   },
   createListButton: {
     flexDirection: "row",
