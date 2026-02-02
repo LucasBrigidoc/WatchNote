@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
   },
   fabContainer: {
     position: "relative",
-    marginHorizontal: 20,
+    marginHorizontal: 30,
     alignItems: "center",
     justifyContent: "center",
     zIndex: 1,
@@ -211,13 +211,13 @@ const styles = StyleSheet.create({
   leftIcons: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 20,
+    gap: 30,
   },
   profileTabWrapper: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 20,
+    gap: 30,
   },
   settingsIcon: {
     // No extra margin needed with gap
