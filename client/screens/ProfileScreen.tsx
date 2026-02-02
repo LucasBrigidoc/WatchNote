@@ -238,16 +238,6 @@ export default function ProfileScreen() {
             style={styles.banner}
             contentFit="cover"
           />
-          <View style={[styles.settingsButtonWrapper, { top: insets.top + Spacing.md }]}>
-            <Pressable
-              style={[
-                styles.iconButton,
-                { backgroundColor: "rgba(0,0,0,0.5)" },
-              ]}
-            >
-              <Feather name="settings" size={20} color="#FFF" />
-            </Pressable>
-          </View>
         </View>
 
         <View style={styles.header}>

@@ -87,14 +87,27 @@ function TabBarWithFAB({
           else if (route.name === "DiscoverTab") iconName = "compass";
           else if (route.name === "ProfileTab") iconName = "user";
 
+          const isProfile = route.name === "ProfileTab";
+
           return (
             <View key={route.key} style={styles.tabItem}>
-              <Feather
-                name={iconName}
-                size={24}
-                color={isFocused ? theme.accent : theme.tabIconDefault}
-                onPress={onPress}
-              />
+              <View style={isProfile ? styles.profileTabWrapper : null}>
+                <Feather
+                  name={iconName}
+                  size={24}
+                  color={isFocused ? theme.accent : theme.tabIconDefault}
+                  onPress={onPress}
+                />
+                {isProfile && (
+                  <Feather
+                    name="settings"
+                    size={20}
+                    color={theme.tabIconDefault}
+                    style={styles.settingsIcon}
+                    onPress={() => navigation.navigate("Settings")}
+                  />
+                )}
+              </View>
             </View>
           );
         })}
@@ -175,5 +188,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginTop: -28,
+  },
+  profileTabWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  settingsIcon: {
+    marginLeft: 4,
   },
 });
