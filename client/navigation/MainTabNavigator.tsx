@@ -96,7 +96,7 @@ function TabBarWithFAB({
             <Feather
               name="user"
               size={26}
-              color={state.index === 3 ? theme.accent : theme.tabIconDefault}
+              color={state.index === 3 && state.routes[3].state?.routes[state.routes[3].state?.index || 0].name === "Profile" ? theme.accent : theme.tabIconDefault}
             />
           </Pressable>
           <Pressable
