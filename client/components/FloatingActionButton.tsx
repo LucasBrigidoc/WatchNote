@@ -56,7 +56,7 @@ export function FloatingActionButton({
         end={{ x: 1, y: 1 }}
         style={styles.gradient}
       >
-        <Feather name="plus" size={20} color="#FFFFFF" />
+        <Feather name="plus" size={18} color="#FFFFFF" />
       </LinearGradient>
     </AnimatedPressable>
   );
@@ -64,9 +64,9 @@ export function FloatingActionButton({
 
 const styles = StyleSheet.create({
   container: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     overflow: "hidden",
   },
   gradient: {

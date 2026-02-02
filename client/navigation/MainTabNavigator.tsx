@@ -176,7 +176,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     height: 64,
     alignItems: "center",
-    paddingHorizontal: 16,
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
   },
   tabItem: {
     flex: 1,
@@ -184,7 +185,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   fabContainer: {
-    width: 64,
+    flex: 1,
     alignItems: "center",
     justifyContent: "center",
     marginTop: -20,
@@ -193,7 +194,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 16,
+    gap: 20,
   },
   settingsIcon: {
     // No extra margin needed with gap
