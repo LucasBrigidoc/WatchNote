@@ -13,3 +13,4 @@
 - [x] Integrar busca de filmes e séries no frontend
 - [x] Integrar API de Livros (Google Books)
 - [x] Integrar busca de músicas (Deezer)
+- [x] Integrar busca de animes (Jikan/MyAnimeList)

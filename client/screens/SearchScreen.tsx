@@ -65,6 +65,10 @@ export default function SearchScreen() {
       const musicResponse = await fetch(`${baseUrl}/api/music/search?q=${encodeURIComponent(searchQuery)}`);
       const musicData = await musicResponse.json().catch(() => ({ data: [] }));
 
+      // Busca Animes (Jikan)
+      const animeResponse = await fetch(`${baseUrl}/api/anime/search?q=${encodeURIComponent(searchQuery)}`);
+      const animeData = await animeResponse.json().catch(() => ({ data: [] }));
+
       let allResults: any[] = [];
 
       if (movieData.results) {
@@ -99,6 +103,17 @@ export default function SearchScreen() {
           type: "music",
           year: "", // Deezer search doesn't provide year directly in top results usually
           rating: 0,
+        }))];
+      }
+
+      if (animeData.data) {
+        allResults = [...allResults, ...animeData.data.map((item: any) => ({
+          id: `anime-${item.mal_id}`,
+          title: item.title,
+          imageUrl: item.images.jpg.large_image_url || item.images.jpg.image_url || "https://via.placeholder.com/400x600?text=No+Image",
+          type: "anime",
+          year: (item.aired?.from || "").split("-")[0],
+          rating: item.score ? item.score / 2 : 0,
         }))];
       }
 
