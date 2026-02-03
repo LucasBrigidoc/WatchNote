@@ -281,6 +281,7 @@ export default function CreatePostScreen() {
                 style={[styles.commentInput, { color: theme.text }]}
                 multiline
                 textAlignVertical="top"
+                containerStyle={{ marginBottom: 0 }}
               />
             </View>
           </>
@@ -373,7 +374,7 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.lg,
     borderWidth: 1,
     padding: Spacing.md,
-    minHeight: 120,
+    minHeight: 250,
   },
   commentInput: {
     fontSize: 16,

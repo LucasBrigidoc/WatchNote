@@ -12,10 +12,11 @@ import { Spacing } from "@/constants/theme";
 interface CustomTextInputProps extends TextInputProps {
   icon?: React.ReactNode;
   rightElement?: React.ReactNode;
+  containerStyle?: any;
 }
 
 export const TextInput = forwardRef<RNTextInput, CustomTextInputProps>(
-  ({ icon, rightElement, style, onFocus, onBlur, ...props }, ref) => {
+  ({ icon, rightElement, style, onFocus, onBlur, containerStyle, ...props }, ref) => {
     const { theme } = useTheme();
     const [isFocused, setIsFocused] = useState(false);
     const [focusAnim] = useState(new Animated.Value(0));
@@ -46,7 +47,7 @@ export const TextInput = forwardRef<RNTextInput, CustomTextInputProps>(
     });
 
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, containerStyle]}>
         <View style={styles.inputWrapper}>
           {icon && <View style={styles.iconContainer}>{icon}</View>}
           <RNTextInput
