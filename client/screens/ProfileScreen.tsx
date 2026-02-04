@@ -346,12 +346,6 @@ export default function ProfileScreen() {
           <ThemedText type="h3" style={styles.name}>
             {name}
           </ThemedText>
-          <ThemedText
-            type="small"
-            style={[styles.bio, { color: theme.textSecondary }]}
-          >
-            {bio}
-          </ThemedText>
 
           <View style={styles.stats}>
             <StatCard value={0} label="Reviews" />
