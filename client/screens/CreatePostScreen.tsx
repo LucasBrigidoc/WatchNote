@@ -63,6 +63,7 @@ export default function CreatePostScreen() {
   const [selectedMedia, setSelectedMedia] = useState<any | null>(null);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
+  const [isFavorite, setIsFavorite] = useState(false);
 
   const searchMovies = async (query: string) => {
     if (!query.trim()) {
@@ -334,6 +335,41 @@ export default function CreatePostScreen() {
               type="small"
               style={[styles.sectionLabel, { color: theme.textSecondary }]}
             >
+              Favorito
+            </ThemedText>
+            <Pressable
+              onPress={() => {
+                setIsFavorite(!isFavorite);
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              }}
+              style={[
+                styles.favoriteToggle,
+                {
+                  backgroundColor: isFavorite ? theme.accent + "20" : theme.backgroundDefault,
+                  borderColor: isFavorite ? theme.accent : theme.border,
+                },
+              ]}
+            >
+              <Feather
+                name="star"
+                size={20}
+                color={isFavorite ? theme.accent : theme.textSecondary}
+              />
+              <ThemedText
+                style={{
+                  marginLeft: Spacing.sm,
+                  color: isFavorite ? theme.accent : theme.textSecondary,
+                  fontWeight: isFavorite ? "600" : "400",
+                }}
+              >
+                {isFavorite ? "Marcar como favorito da categoria" : "Marcar como favorito da categoria"}
+              </ThemedText>
+            </Pressable>
+
+            <ThemedText
+              type="small"
+              style={[styles.sectionLabel, { color: theme.textSecondary }]}
+            >
               Your rating
             </ThemedText>
             <View style={styles.ratingContainer}>
@@ -496,5 +532,12 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.lg,
     alignItems: "center",
     justifyContent: "center",
+  },
+  favoriteToggle: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: Spacing.md,
+    borderRadius: BorderRadius.lg,
+    borderWidth: 1,
   },
 });
