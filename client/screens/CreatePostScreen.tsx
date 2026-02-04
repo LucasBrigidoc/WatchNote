@@ -89,16 +89,7 @@ export default function CreatePostScreen() {
           <ThemedText style={{ color: theme.textSecondary }}>Cancel</ThemedText>
         </Pressable>
         <ThemedText type="h4">Create Post</ThemedText>
-        <Pressable onPress={handlePublish} disabled={!canPublish}>
-          <ThemedText
-            style={{
-              color: canPublish ? theme.accent : theme.textSecondary,
-              fontWeight: "600",
-            }}
-          >
-            Publish
-          </ThemedText>
-        </Pressable>
+        <View style={{ width: 40 }} />
       </View>
 
       <ScrollView
@@ -289,6 +280,28 @@ export default function CreatePostScreen() {
                 containerStyle={{ flex: 1, marginBottom: 0 }}
               />
             </View>
+
+            <Pressable
+              onPress={handlePublish}
+              disabled={!canPublish}
+              style={[
+                styles.publishButton,
+                {
+                  backgroundColor: canPublish ? theme.accent : theme.border,
+                  opacity: canPublish ? 1 : 0.6,
+                },
+              ]}
+            >
+              <ThemedText
+                style={{
+                  color: "#0D0D0D",
+                  fontWeight: "700",
+                  fontSize: 16,
+                }}
+              >
+                Publicar
+              </ThemedText>
+            </Pressable>
           </>
         )}
       </ScrollView>
@@ -385,5 +398,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 24,
     flex: 1,
+  },
+  publishButton: {
+    marginTop: Spacing.xl,
+    height: 56,
+    borderRadius: BorderRadius.lg,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
