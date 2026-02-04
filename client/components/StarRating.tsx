@@ -78,6 +78,11 @@ export function StarRating({
   return (
     <View style={styles.outerContainer}>
       <View style={styles.container}>
+        <View style={styles.labelContainer}>
+          <Text style={[styles.ratingText, { color: theme.textSecondary, fontSize: size * 0.9 }]}>
+            {formattedRating}
+          </Text>
+        </View>
         <View 
           style={styles.starsContainer}
           onStartShouldSetResponder={() => editable}
@@ -86,11 +91,6 @@ export function StarRating({
           onResponderMove={handlePanResponder}
         >
           {Array.from({ length: maxRating }, (_, i) => renderStar(i))}
-        </View>
-        <View style={styles.labelContainer}>
-          <Text style={[styles.ratingText, { color: theme.textSecondary, fontSize: size * 0.8 }]}>
-            {formattedRating}
-          </Text>
         </View>
       </View>
     </View>
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
   labelContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginLeft: Spacing.xs,
+    marginRight: 6,
   },
   labelIcon: {
     marginLeft: 4,

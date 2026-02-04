@@ -21,6 +21,7 @@ interface MediaCardProps {
   type: MediaType;
   year?: string;
   rating?: number;
+  duration?: string;
   onPress?: () => void;
   variant?: "compact" | "full" | "gradient";
 }
@@ -34,6 +35,7 @@ export function MediaCard({
   type,
   year,
   rating,
+  duration,
   onPress,
   variant = "compact",
 }: MediaCardProps) {
@@ -114,11 +116,13 @@ export function MediaCard({
             {title}
           </ThemedText>
           <View style={styles.fullInfo}>
-            {rating !== undefined ? <StarRating rating={rating} size={14} /> : null}
-            <View style={styles.infoDot} />
-            <ThemedText type="small" style={{ color: theme.textSecondary }}>
-              2h 15m
-            </ThemedText>
+            <StarRating rating={rating} size={14} />
+            <View style={{ flex: 1 }} />
+            {duration ? (
+              <ThemedText type="small" style={{ color: theme.textSecondary }}>
+                {duration}
+              </ThemedText>
+            ) : null}
           </View>
         </View>
       </AnimatedPressable>
