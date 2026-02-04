@@ -129,6 +129,19 @@ export default function ProfileScreen() {
         </GlassCard>
 
         <GlassCard style={styles.statsCard}>
+          <ThemedText type="body" style={styles.statsTitle}>Meus Favoritos</ThemedText>
+          {FAVORITES.map((item) => (
+            <View key={item.label} style={styles.favoriteRow}>
+              <View style={styles.favoriteLabel}>
+                <Feather name={item.icon as any} size={16} color={theme.textSecondary} />
+                <ThemedText type="small" style={{ marginLeft: 8, color: theme.textSecondary }}>{item.label}</ThemedText>
+              </View>
+              <ThemedText type="body" style={styles.favoriteTitle}>{item.title}</ThemedText>
+            </View>
+          ))}
+        </GlassCard>
+
+        <GlassCard style={styles.statsCard}>
           <ThemedText type="body" style={styles.statsTitle}>Avaliações</ThemedText>
           {RATINGS_DISTRIBUTION.map((item) => (
             <View key={item.stars} style={styles.ratingRow}>
@@ -169,22 +182,9 @@ export default function ProfileScreen() {
             ))}
           </View>
         </GlassCard>
-
-      <GlassCard style={styles.statsCard}>
-        <ThemedText type="body" style={styles.statsTitle}>Meus Favoritos</ThemedText>
-        {FAVORITES.map((item) => (
-          <View key={item.label} style={styles.favoriteRow}>
-            <View style={styles.favoriteLabel}>
-              <Feather name={item.icon as any} size={16} color={theme.textSecondary} />
-              <ThemedText type="small" style={{ marginLeft: 8, color: theme.textSecondary }}>{item.label}</ThemedText>
-            </View>
-            <ThemedText type="body" style={styles.favoriteTitle}>{item.title}</ThemedText>
-          </View>
-        ))}
-      </GlassCard>
-    </View>
-  );
-};
+      </View>
+    );
+  };
 
   const renderTabContent = () => {
     switch (activeTab) {
