@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   View,
   Pressable,
   ScrollView,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
@@ -57,13 +58,112 @@ export default function CreatePostScreen() {
 
   const [selectedType, setSelectedType] = useState<MediaTypeOption | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedMedia, setSelectedMedia] = useState<
-    (typeof MOCK_SEARCH_RESULTS)[0] | null
-  >(null);
+  const [loading, setLoading] = useState(false);
+  const [results, setResults] = useState<any[]>([]);
+  const [selectedMedia, setSelectedMedia] = useState<any | null>(null);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
 
-  const canPublish = selectedMedia && rating > 0 && comment.trim().length > 0;
+  const searchMovies = async (query: string) => {
+    if (!query.trim()) {
+      setResults([]);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const baseUrl = process.env.EXPO_PUBLIC_DOMAIN 
+        ? `https://${process.env.EXPO_PUBLIC_DOMAIN}` 
+        : "http://127.0.0.1:5000";
+      
+      const [movieRes, bookRes, musicRes, animeRes, mangaRes] = await Promise.all([
+        fetch(`${baseUrl}/api/movies/search?q=${encodeURIComponent(query)}`).then(r => r.json()),
+        fetch(`${baseUrl}/api/books/search?q=${encodeURIComponent(query)}`).then(r => r.json().catch(() => ({ items: [] }))),
+        fetch(`${baseUrl}/api/music/search?q=${encodeURIComponent(query)}`).then(r => r.json().catch(() => ({ data: [] }))),
+        fetch(`${baseUrl}/api/anime/search?q=${encodeURIComponent(query)}`).then(r => r.json().catch(() => ({ data: [] }))),
+        fetch(`${baseUrl}/api/manga/search?q=${encodeURIComponent(query)}`).then(r => r.json().catch(() => ({ data: [] })))
+      ]);
+
+      let allResults: any[] = [];
+
+      if (movieRes.results) {
+        allResults = [...allResults, ...movieRes.results.map((item: any) => ({
+          id: `movie-${item.id}`,
+          title: item.title || item.name,
+          imageUrl: item.poster_path 
+            ? `https://image.tmdb.org/t/p/w500${item.poster_path}`
+            : "https://via.placeholder.com/400x600?text=No+Image",
+          type: item.media_type === "movie" ? "film" : "series",
+          year: (item.release_date || item.first_air_date || "").split("-")[0],
+          artist: item.media_type === "movie" ? "Movie" : "Series"
+        }))];
+      }
+
+      if (bookRes.items) {
+        allResults = [...allResults, ...bookRes.items.map((item: any) => ({
+          id: `book-${item.id}`,
+          title: item.volumeInfo.title,
+          imageUrl: item.volumeInfo.imageLinks?.thumbnail?.replace("http://", "https://") || "https://via.placeholder.com/400x600?text=No+Image",
+          type: "book",
+          year: (item.volumeInfo.publishedDate || "").split("-")[0],
+          artist: item.volumeInfo.authors?.join(", ") || "Unknown Author"
+        }))];
+      }
+
+      if (musicRes.data) {
+        allResults = [...allResults, ...musicRes.data.map((item: any) => ({
+          id: `music-${item.id}`,
+          title: item.title,
+          imageUrl: item.album.cover_big || item.album.cover_medium || "https://via.placeholder.com/400x400?text=No+Image",
+          type: "music",
+          year: "",
+          artist: item.artist.name
+        }))];
+      }
+
+      if (animeRes.data) {
+        allResults = [...allResults, ...animeRes.data.map((item: any) => ({
+          id: `anime-${item.mal_id}`,
+          title: item.title,
+          imageUrl: item.images.jpg.large_image_url || item.images.jpg.image_url || "https://via.placeholder.com/400x600?text=No+Image",
+          type: "anime",
+          year: (item.aired?.from || "").split("-")[0],
+          artist: "Anime"
+        }))];
+      }
+
+      if (mangaRes.data) {
+        allResults = [...allResults, ...mangaRes.data.map((item: any) => ({
+          id: `manga-${item.mal_id}`,
+          title: item.title,
+          imageUrl: item.images.jpg.large_image_url || item.images.jpg.image_url || "https://via.placeholder.com/400x600?text=No+Image",
+          type: "manga",
+          year: (item.published?.from || "").split("-")[0],
+          artist: "Manga"
+        }))];
+      }
+
+      setResults(allResults);
+    } catch (error) {
+      console.error("Search error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchQuery.length > 2) {
+        searchMovies(searchQuery);
+      } else if (searchQuery.length === 0) {
+        setResults([]);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  const filteredResults = results.filter((m) => !selectedType || m.type === selectedType);
 
   const handlePublish = () => {
     if (!canPublish) return;
@@ -73,12 +173,7 @@ export default function CreatePostScreen() {
     ]);
   };
 
-  const searchResults =
-    searchQuery.length > 0
-      ? MOCK_SEARCH_RESULTS.filter(
-          (m) => !selectedType || m.type === selectedType
-        )
-      : [];
+  const canPublish = selectedMedia && rating > 0 && comment.trim().length > 0;
 
   return (
     <View
@@ -112,7 +207,7 @@ export default function CreatePostScreen() {
               value={searchQuery}
               onChangeText={setSearchQuery}
               placeholder="Search..."
-              icon={<Feather name="search" size={20} color={theme.textSecondary} />}
+              icon={loading ? <ActivityIndicator size="small" color={theme.accent} /> : <Feather name="search" size={20} color={theme.textSecondary} />}
             />
 
             <ThemedText
@@ -167,7 +262,7 @@ export default function CreatePostScreen() {
               ))}
             </ScrollView>
 
-            {searchResults.map((result) => (
+            {filteredResults.map((result) => (
               <Pressable
                 key={result.id}
                 onPress={() => {
