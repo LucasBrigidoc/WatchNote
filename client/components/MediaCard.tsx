@@ -151,7 +151,6 @@ export function MediaCard({
           { backgroundColor: theme.backgroundSecondary, alignItems: 'center', justifyContent: 'center' }
         ]}
       >
-        <MediaTypeBadge type={type} />
       </View>
     </AnimatedPressable>
   );

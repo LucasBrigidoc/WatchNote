@@ -172,6 +172,15 @@ export default function ProfileScreen() {
               <ThemedText type="small" style={{ fontWeight: "700", color: theme.accent }}>Total: {totalReviews}</ThemedText>
             </View>
           </View>
+          <View style={styles.hoursGrid}>
+            {CATEGORY_STATS.map((item) => (
+              <View key={item.label} style={styles.hourItem}>
+                <Feather name={item.icon as any} size={20} color={theme.accent} />
+                <ThemedText type="h3" style={styles.hourValue}>{item.count}</ThemedText>
+                <ThemedText type="small" style={{ color: theme.textSecondary }}>{item.label}</ThemedText>
+              </View>
+            ))}
+          </View>
         </GlassCard>
       </View>
     );
