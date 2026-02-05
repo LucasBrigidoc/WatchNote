@@ -136,11 +136,14 @@ export function MediaCard({
       onPressOut={handlePressOut}
       style={[styles.compactCard, animatedStyle]}
     >
-      <Image
-        source={{ uri: imageUrl }}
-        style={styles.compactImage}
-        contentFit="cover"
-      />
+      <View
+        style={[
+          styles.compactImage,
+          { backgroundColor: theme.backgroundSecondary, alignItems: 'center', justifyContent: 'center' }
+        ]}
+      >
+        <MediaTypeBadge type={type} />
+      </View>
     </AnimatedPressable>
   );
 }

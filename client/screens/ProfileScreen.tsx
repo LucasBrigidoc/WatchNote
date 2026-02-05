@@ -73,12 +73,12 @@ const RATINGS_DISTRIBUTION = [
   { stars: 1, count: 0 },
 ];
 
-const CATEGORY_HOURS = [
-  { label: "Filme", hours: 142, icon: "film" },
-  { label: "Série", hours: 256, icon: "tv" },
-  { label: "Música", hours: 1240, icon: "music" },
-  { label: "Anime", hours: 89, icon: "monitor" },
-  { label: "Livro", hours: 45, icon: "book" },
+const CATEGORY_STATS = [
+  { label: "Filme", count: 12, icon: "film" },
+  { label: "Série", count: 8, icon: "tv" },
+  { label: "Música", count: 45, icon: "music" },
+  { label: "Anime", count: 15, icon: "monitor" },
+  { label: "Livro", count: 3, icon: "book" },
 ];
 
 const FAVORITES = [
@@ -117,7 +117,7 @@ export default function ProfileScreen() {
   const avatarUrl = user?.avatarUrl;
 
   const renderStatsSection = () => {
-    const totalHours = CATEGORY_HOURS.reduce((sum, item) => sum + item.hours, 0);
+    const totalReviews = CATEGORY_STATS.reduce((sum, item) => sum + item.count, 0);
 
     return (
       <View style={styles.statsSection}>
@@ -167,16 +167,16 @@ export default function ProfileScreen() {
 
         <GlassCard style={styles.statsCard}>
           <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: Spacing.md }}>
-            <ThemedText type="body" style={{ fontWeight: "600" }}>Tempo por Categoria</ThemedText>
+            <ThemedText type="body" style={{ fontWeight: "600" }}>Quantidade por Categoria</ThemedText>
             <View style={{ backgroundColor: theme.backgroundSecondary, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 4 }}>
-              <ThemedText type="small" style={{ fontWeight: "700", color: theme.accent }}>Total: {totalHours}h</ThemedText>
+              <ThemedText type="small" style={{ fontWeight: "700", color: theme.accent }}>Total: {totalReviews}</ThemedText>
             </View>
           </View>
           <View style={styles.hoursGrid}>
-            {CATEGORY_HOURS.map((item) => (
+            {CATEGORY_STATS.map((item) => (
               <View key={item.label} style={styles.hourItem}>
                 <Feather name={item.icon as any} size={20} color={theme.accent} />
-                <ThemedText type="h3" style={styles.hourValue}>{item.hours}h</ThemedText>
+                <ThemedText type="h3" style={styles.hourValue}>{item.count}</ThemedText>
                 <ThemedText type="small" style={{ color: theme.textSecondary }}>{item.label}</ThemedText>
               </View>
             ))}
