@@ -24,6 +24,7 @@ interface MediaCardProps {
   duration?: string;
   onPress?: () => void;
   variant?: "compact" | "full" | "gradient";
+  showFullStars?: boolean;
 }
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
@@ -38,6 +39,7 @@ export function MediaCard({
   duration,
   onPress,
   variant = "compact",
+  showFullStars = true,
 }: MediaCardProps) {
   const { theme } = useTheme();
   const scale = useSharedValue(1);
@@ -116,7 +118,7 @@ export function MediaCard({
             {title}
           </ThemedText>
           <View style={styles.fullInfo}>
-            <StarRating rating={rating} size={14} />
+            <StarRating rating={rating} size={14} showStars={showFullStars} />
             <View style={{ flex: 1 }} />
             {duration ? (
               <ThemedText type="small" style={{ color: theme.textSecondary }}>

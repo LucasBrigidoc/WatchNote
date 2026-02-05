@@ -168,6 +168,7 @@ export default function SearchScreen() {
       year={item.year}
       rating={item.rating}
       variant="full"
+      showFullStars={false}
     />
   );
 

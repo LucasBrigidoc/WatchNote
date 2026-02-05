@@ -13,6 +13,7 @@ interface StarRatingProps {
   editable?: boolean;
   onRatingChange?: (rating: number) => void;
   showHalf?: boolean;
+  showStars?: boolean;
 }
 
 export function StarRating({
@@ -22,6 +23,7 @@ export function StarRating({
   editable = false,
   onRatingChange,
   showHalf = true,
+  showStars = true,
 }: StarRatingProps) {
   const { theme } = useTheme();
 
@@ -97,15 +99,17 @@ export function StarRating({
             {formattedRating}/{maxRating}
           </Text>
         </View>
-        <View 
-          style={styles.starsContainer}
-          onStartShouldSetResponder={() => editable}
-          onMoveShouldSetResponder={() => editable}
-          onResponderGrant={handlePanResponder}
-          onResponderMove={handlePanResponder}
-        >
-          {Array.from({ length: maxRating }, (_, i) => renderStar(i))}
-        </View>
+        {showStars && (
+          <View 
+            style={styles.starsContainer}
+            onStartShouldSetResponder={() => editable}
+            onMoveShouldSetResponder={() => editable}
+            onResponderGrant={handlePanResponder}
+            onResponderMove={handlePanResponder}
+          >
+            {Array.from({ length: maxRating }, (_, i) => renderStar(i))}
+          </View>
+        )}
       </View>
     </View>
   );
