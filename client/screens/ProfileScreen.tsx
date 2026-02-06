@@ -151,11 +151,8 @@ export default function ProfileScreen() {
         </GlassCard>
 
         <GlassCard style={styles.statsCard}>
-          <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: Spacing.md }}>
+          <View style={{ marginBottom: Spacing.md }}>
             <ThemedText type="body" style={{ fontWeight: "600" }}>Quantidade por Categoria</ThemedText>
-            <View style={{ backgroundColor: theme.backgroundSecondary, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 4 }}>
-              <ThemedText type="small" style={{ fontWeight: "700", color: theme.accent }}>Total: {totalReviews}</ThemedText>
-            </View>
           </View>
           <View style={styles.statsGrid}>
             {CATEGORY_STATS.map((item) => (
@@ -169,6 +166,15 @@ export default function ProfileScreen() {
                 </View>
               </View>
             ))}
+            <View style={styles.statItem}>
+              <View style={[styles.statIconContainer, { backgroundColor: theme.backgroundSecondary }]}>
+                <Feather name="bar-chart-2" size={16} color={theme.accent} />
+              </View>
+              <View style={styles.statInfo}>
+                <ThemedText type="small" style={{ color: theme.textSecondary }}>Total</ThemedText>
+                <ThemedText type="body" style={styles.statCount}>{totalReviews}</ThemedText>
+              </View>
+            </View>
           </View>
         </GlassCard>
       </View>
