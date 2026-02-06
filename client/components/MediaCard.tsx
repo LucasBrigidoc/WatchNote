@@ -70,7 +70,6 @@ export function MediaCard({
           source={{ uri: imageUrl }}
           style={styles.gradientImage}
           contentFit="cover"
-          tintColor="rgba(0, 123, 255, 0.4)"
         />
         <LinearGradient
           colors={["transparent", "rgba(0,0,0,0.8)"]}
@@ -86,58 +85,6 @@ export function MediaCard({
     );
   }
 
-  if (variant === "full") {
-    return (
-      <AnimatedPressable
-        onPress={onPress}
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
-        style={[
-          styles.fullCard,
-          { backgroundColor: theme.backgroundDefault },
-          Shadows.soft,
-          animatedStyle,
-        ]}
-      >
-        <Image
-          source={{ uri: imageUrl }}
-          style={styles.fullImage}
-          contentFit="cover"
-        />
-        <View style={styles.fullContent}>
-          <View style={styles.fullHeader}>
-            <MediaTypeBadge type={type} />
-            {year ? (
-              <ThemedText
-                type="small"
-                style={{ color: theme.textSecondary }}
-              >
-                {year}
-              </ThemedText>
-            ) : null}
-          </View>
-          <ThemedText type="h4" numberOfLines={2} style={styles.fullTitle}>
-            {title}
-          </ThemedText>
-          <View style={styles.fullInfo}>
-            <StarRating 
-              rating={rating} 
-              size={14} 
-              showStars={showFullStars} 
-              inlineStars={inlineStars}
-            />
-            <View style={{ flex: 1 }} />
-            {duration ? (
-              <ThemedText type="small" style={{ color: theme.textSecondary }}>
-                {duration}
-              </ThemedText>
-            ) : null}
-          </View>
-        </View>
-      </AnimatedPressable>
-    );
-  }
-
   return (
     <AnimatedPressable
       onPress={onPress}
@@ -145,12 +92,29 @@ export function MediaCard({
       onPressOut={handlePressOut}
       style={[styles.compactCard, animatedStyle]}
     >
-      <View
-        style={[
-          styles.compactImage,
-          { backgroundColor: theme.backgroundSecondary, alignItems: 'center', justifyContent: 'center' }
-        ]}
+      <Image
+        source={{ uri: imageUrl }}
+        style={styles.compactImage}
+        contentFit="cover"
+      />
+      <ThemedText
+        type="body"
+        weight="semibold"
+        numberOfLines={1}
+        style={[styles.compactTitle, { color: theme.textPrimary }]}
       >
+        {title}
+      </ThemedText>
+      <View style={styles.compactInfo}>
+        <MediaTypeBadge type={type} />
+        {year ? (
+          <>
+            <View style={styles.infoDot} />
+            <ThemedText type="small" style={{ color: theme.textSecondary }}>
+              {year}
+            </ThemedText>
+          </>
+        ) : null}
       </View>
     </AnimatedPressable>
   );
