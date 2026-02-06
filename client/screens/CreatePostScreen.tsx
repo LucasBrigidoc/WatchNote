@@ -64,6 +64,8 @@ export default function CreatePostScreen() {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [isFavorite, setIsFavorite] = useState(false);
+  const [firstTime, setFirstTime] = useState(true);
+  const [hasSpoilers, setHasSpoilers] = useState(false);
 
   const searchMovies = async (query: string) => {
     if (!query.trim()) {
@@ -381,6 +383,35 @@ export default function CreatePostScreen() {
               />
             </View>
 
+            <Pressable
+              onPress={() => {
+                setFirstTime(!firstTime);
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              }}
+              style={[
+                styles.toggleButton,
+                {
+                  backgroundColor: firstTime ? theme.accent + "20" : theme.backgroundDefault,
+                  borderColor: firstTime ? theme.accent : theme.border,
+                },
+              ]}
+            >
+              <Feather
+                name={firstTime ? "eye" : "refresh-cw"}
+                size={20}
+                color={firstTime ? theme.accent : theme.textSecondary}
+              />
+              <ThemedText
+                style={{
+                  marginLeft: Spacing.sm,
+                  color: firstTime ? theme.accent : theme.textSecondary,
+                  fontWeight: firstTime ? "600" : "400",
+                }}
+              >
+                {firstTime ? "Primeira vez que eu vi" : "Já tinha visto antes"}
+              </ThemedText>
+            </Pressable>
+
             <ThemedText
               type="small"
               style={[styles.sectionLabel, { color: theme.textSecondary }]}
@@ -407,6 +438,36 @@ export default function CreatePostScreen() {
                 containerStyle={{ flex: 1, marginBottom: 0 }}
               />
             </View>
+
+            <Pressable
+              onPress={() => {
+                setHasSpoilers(!hasSpoilers);
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              }}
+              style={[
+                styles.toggleButton,
+                {
+                  marginTop: Spacing.md,
+                  backgroundColor: hasSpoilers ? "#FF4B4B20" : theme.backgroundDefault,
+                  borderColor: hasSpoilers ? "#FF4B4B" : theme.border,
+                },
+              ]}
+            >
+              <Feather
+                name="alert-triangle"
+                size={20}
+                color={hasSpoilers ? "#FF4B4B" : theme.textSecondary}
+              />
+              <ThemedText
+                style={{
+                  marginLeft: Spacing.sm,
+                  color: hasSpoilers ? "#FF4B4B" : theme.textSecondary,
+                  fontWeight: hasSpoilers ? "600" : "400",
+                }}
+              >
+                {hasSpoilers ? "Contém Spoilers" : "Indicar que tem spoilers"}
+              </ThemedText>
+            </Pressable>
 
             <Pressable
               onPress={handlePublish}
@@ -534,6 +595,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   favoriteToggle: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: Spacing.md,
+    borderRadius: BorderRadius.lg,
+    borderWidth: 1,
+  },
+  toggleButton: {
     flexDirection: "row",
     alignItems: "center",
     padding: Spacing.md,
