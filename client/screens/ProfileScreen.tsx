@@ -48,15 +48,7 @@ const MOCK_POSTS = [
   },
 ];
 
-const MOCK_REVIEWS = [
-  {
-    id: "r1",
-    title: "Yeezus",
-    imageUrl: "https://picsum.photos/seed/myyeezus/400/400",
-    type: "music" as const,
-    rating: 4,
-  },
-];
+const MOCK_REVIEWS = [];
 
 const RATINGS_DISTRIBUTION = [
   { stars: 5, count: 12 },
