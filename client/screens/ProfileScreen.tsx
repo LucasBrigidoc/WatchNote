@@ -202,7 +202,7 @@ export default function ProfileScreen() {
         return (
           <View style={styles.reviewsContainer}>
             {renderStatsSection()}
-            {MOCK_REVIEWS.length > 0 ? (
+            {MOCK_REVIEWS.length > 0 && (
               <View style={styles.reviewsGrid}>
                 {MOCK_REVIEWS.map((item) => (
                   <MediaCard
@@ -216,12 +216,6 @@ export default function ProfileScreen() {
                   />
                 ))}
               </View>
-            ) : (
-              <EmptyState
-                type="reviews"
-                title="No reviews yet"
-                message="Rate and review media to build your collection."
-              />
             )}
           </View>
         );
