@@ -119,7 +119,7 @@ export function StarRating({
 
 const styles = StyleSheet.create({
   outerContainer: {
-    alignItems: "center",
+    alignItems: "flex-start",
   },
   container: {
     alignItems: "center",

@@ -101,7 +101,7 @@ export function PostCard({
             <ThemedText type="body" style={styles.mediaTitle} numberOfLines={2}>
               {media.title}
             </ThemedText>
-            <StarRating rating={rating} size={16} />
+            <StarRating rating={rating} size={16} inlineStars={true} />
           </View>
         </View>
 
@@ -148,6 +148,12 @@ export function PostCard({
             style={styles.actionButton}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
+            <Feather name="repeat" size={18} color={theme.textSecondary} />
+          </Pressable>
+          <Pressable
+            style={styles.actionButton}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
             <Feather name="share" size={18} color={theme.textSecondary} />
           </Pressable>
         </View>
@@ -180,8 +186,8 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.md,
   },
   mediaImage: {
-    width: 80,
-    height: 80,
+    width: 110,
+    height: 110,
     borderRadius: BorderRadius.sm,
   },
   mediaInfo: {
