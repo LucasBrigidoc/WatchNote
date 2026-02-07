@@ -32,11 +32,19 @@
 - [x] Integrar busca de animes (Jikan/MyAnimeList)
 - [x] Integrar busca de mangás (Jikan/MyAnimeList)
 
+## Autenticação
+- **Schema**: Tabela `users` com id (UUID), username, email, password (bcrypt hash), name, bio, avatarUrl, createdAt
+- **Backend**: Rotas `/api/auth/register`, `/api/auth/login`, `/api/auth/me`, `/api/auth/logout` com bcryptjs e tokens
+- **Frontend**: AuthContext com chamadas reais à API, persistência de token via AsyncStorage, auto-login no startup
+- **Storage**: DatabaseStorage com Drizzle ORM + pg Pool (server/db.ts, server/storage.ts)
+
 ## Mudanças Recentes (2026-02-07)
+- Implementado sistema de autenticação completo (registro, login, perfil) com banco de dados real
+- Expandida tabela de usuários com email, nome, bio, avatarUrl, createdAt
+- Criado DatabaseStorage substituindo MemStorage por PostgreSQL real via Drizzle ORM
 - Criado componente MediaCardFull para exibição de mídias em cards de largura total
 - Criada tela MediaDetailScreen com detalhes da mídia, avaliação, salvar e posts relacionados
 - Atualizada navegação para incluir rota MediaDetail nos stacks Home e Discover
 - Atualizada DiscoverScreen com cards de largura total e filtros por categoria
 - Atualizada SearchScreen para usar MediaCardFull nos resultados de busca com navegação para detalhes
 - Adicionado mapeamento de gêneros TMDB (IDs para nomes em português)
-- Corrigidos erros LSP pré-existentes em MediaCard.tsx
