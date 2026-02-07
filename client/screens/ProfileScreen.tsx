@@ -48,7 +48,7 @@ const MOCK_POSTS = [
   },
 ];
 
-const MOCK_REVIEWS = [];
+const MOCK_REVIEWS: any[] = [];
 
 const RATINGS_DISTRIBUTION = [
   { stars: 5, count: 12 },

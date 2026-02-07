@@ -1,10 +1,12 @@
-import React, { createContext, useContext, useState, useCallback } from "react";
+import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getApiUrl } from "@/lib/query-client";
 
 interface User {
   id: string;
   name: string;
   email: string;
+  username: string;
   avatarUrl?: string;
   bio?: string;
 }
@@ -20,26 +22,81 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const AUTH_STORAGE_KEY = "@culturehub:auth";
+const TOKEN_KEY = "@culturehub:token";
+const USER_KEY = "@culturehub:user";
+
+async function authFetch(endpoint: string, options: RequestInit = {}) {
+  const baseUrl = getApiUrl();
+  const url = new URL(endpoint, baseUrl);
+
+  const token = await AsyncStorage.getItem(TOKEN_KEY);
+
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    ...(options.headers as Record<string, string> || {}),
+  };
+
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  const res = await fetch(url.toString(), {
+    ...options,
+    headers,
+  });
+
+  return res;
+}
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const savedToken = await AsyncStorage.getItem(TOKEN_KEY);
+        if (!savedToken) {
+          setIsLoading(false);
+          return;
+        }
+
+        const res = await authFetch("/api/auth/me");
+        if (res.ok) {
+          const data = await res.json();
+          setUser(data.user);
+          await AsyncStorage.setItem(USER_KEY, JSON.stringify(data.user));
+        } else {
+          await AsyncStorage.multiRemove([TOKEN_KEY, USER_KEY]);
+        }
+      } catch {
+        const savedUser = await AsyncStorage.getItem(USER_KEY);
+        if (savedUser) {
+          setUser(JSON.parse(savedUser));
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    })();
+  }, []);
 
   const login = useCallback(async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const res = await authFetch("/api/auth/login", {
+        method: "POST",
+        body: JSON.stringify({ email, password }),
+      });
 
-      const mockUser: User = {
-        id: "1",
-        name: "Lucas Brigido",
-        email: email,
-        bio: "Film enthusiast & music lover",
-      };
+      const data = await res.json();
 
-      await AsyncStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(mockUser));
-      setUser(mockUser);
+      if (!res.ok) {
+        throw new Error(data.message || "Erro ao fazer login");
+      }
+
+      await AsyncStorage.setItem(TOKEN_KEY, data.token);
+      await AsyncStorage.setItem(USER_KEY, JSON.stringify(data.user));
+      setUser(data.user);
     } finally {
       setIsLoading(false);
     }
@@ -49,17 +106,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     async (name: string, email: string, password: string) => {
       setIsLoading(true);
       try {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        const res = await authFetch("/api/auth/register", {
+          method: "POST",
+          body: JSON.stringify({ name, email, password }),
+        });
 
-        const newUser: User = {
-          id: Date.now().toString(),
-          name,
-          email,
-          bio: "",
-        };
+        const data = await res.json();
 
-        await AsyncStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(newUser));
-        setUser(newUser);
+        if (!res.ok) {
+          throw new Error(data.message || "Erro ao criar conta");
+        }
+
+        await AsyncStorage.setItem(TOKEN_KEY, data.token);
+        await AsyncStorage.setItem(USER_KEY, JSON.stringify(data.user));
+        setUser(data.user);
       } finally {
         setIsLoading(false);
       }
@@ -70,7 +130,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = useCallback(async () => {
     setIsLoading(true);
     try {
-      await AsyncStorage.removeItem(AUTH_STORAGE_KEY);
+      await authFetch("/api/auth/logout", { method: "POST" });
+      await AsyncStorage.multiRemove([TOKEN_KEY, USER_KEY]);
       setUser(null);
     } finally {
       setIsLoading(false);

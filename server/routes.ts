@@ -1,8 +1,120 @@
-import type { Express } from "express";
+import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "node:http";
+import bcrypt from "bcryptjs";
+import { randomBytes } from "crypto";
+import { storage } from "./storage";
+
+const tokens = new Map<string, string>();
+
+function generateToken(): string {
+  return randomBytes(32).toString("hex");
+}
+
+function sanitizeUser(user: any) {
+  const { password, ...safe } = user;
+  return safe;
+}
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // prefix all routes with /api
+  app.post("/api/auth/register", async (req: Request, res: Response) => {
+    try {
+      const { name, email, password } = req.body;
+
+      if (!name || !email || !password) {
+        return res.status(400).json({ message: "Nome, email e senha são obrigatórios" });
+      }
+
+      if (password.length < 6) {
+        return res.status(400).json({ message: "A senha deve ter pelo menos 6 caracteres" });
+      }
+
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser) {
+        return res.status(409).json({ message: "Este email já está em uso" });
+      }
+
+      const username = email.split("@")[0] + "_" + Date.now().toString(36);
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      const user = await storage.createUser({
+        username,
+        email,
+        password: hashedPassword,
+        name,
+      });
+
+      const token = generateToken();
+      tokens.set(token, user.id);
+
+      res.status(201).json({ user: sanitizeUser(user), token });
+    } catch (error) {
+      console.error("Register error:", error);
+      res.status(500).json({ message: "Erro ao criar conta" });
+    }
+  });
+
+  app.post("/api/auth/login", async (req: Request, res: Response) => {
+    try {
+      const { email, password } = req.body;
+
+      if (!email || !password) {
+        return res.status(400).json({ message: "Email e senha são obrigatórios" });
+      }
+
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        return res.status(401).json({ message: "Email ou senha incorretos" });
+      }
+
+      const validPassword = await bcrypt.compare(password, user.password);
+      if (!validPassword) {
+        return res.status(401).json({ message: "Email ou senha incorretos" });
+      }
+
+      const token = generateToken();
+      tokens.set(token, user.id);
+
+      res.json({ user: sanitizeUser(user), token });
+    } catch (error) {
+      console.error("Login error:", error);
+      res.status(500).json({ message: "Erro ao fazer login" });
+    }
+  });
+
+  app.get("/api/auth/me", async (req: Request, res: Response) => {
+    try {
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return res.status(401).json({ message: "Não autenticado" });
+      }
+
+      const token = authHeader.split(" ")[1];
+      const userId = tokens.get(token);
+      if (!userId) {
+        return res.status(401).json({ message: "Token inválido" });
+      }
+
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "Usuário não encontrado" });
+      }
+
+      res.json({ user: sanitizeUser(user) });
+    } catch (error) {
+      console.error("Auth me error:", error);
+      res.status(500).json({ message: "Erro ao verificar autenticação" });
+    }
+  });
+
+  app.post("/api/auth/logout", async (req: Request, res: Response) => {
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      const token = authHeader.split(" ")[1];
+      tokens.delete(token);
+    }
+    res.json({ message: "Desconectado com sucesso" });
+  });
+
   app.get("/api/movies/trending", async (req, res) => {
     try {
       const apiKey = process.env.TMDB_API_KEY;
