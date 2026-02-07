@@ -99,9 +99,8 @@ export function MediaCard({
       />
       <ThemedText
         type="body"
-        weight="semibold"
         numberOfLines={1}
-        style={[styles.compactTitle, { color: theme.textPrimary }]}
+        style={[styles.compactTitle, { color: theme.text, fontWeight: "600" }]}
       >
         {title}
       </ThemedText>
