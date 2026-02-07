@@ -4,7 +4,6 @@ import {
   View,
   ScrollView,
   Pressable,
-  TextInput,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
@@ -15,99 +14,122 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { ThemedText } from "@/components/ThemedText";
 import { MediaCard } from "@/components/MediaCard";
+import { MediaCardFull } from "@/components/MediaCardFull";
 import { SectionHeader } from "@/components/SectionHeader";
 import { useTheme } from "@/hooks/useTheme";
 import { Spacing, BorderRadius } from "@/constants/theme";
 import { DiscoverStackParamList } from "@/navigation/DiscoverStackNavigator";
+import { MediaType } from "@/components/MediaTypeBadge";
 
-type MediaType = "all" | "film" | "series" | "music" | "anime" | "manga" | "book";
+type CategoryFilter = "all" | "film" | "series" | "music" | "anime" | "manga" | "book";
 
-const CATEGORIES: { key: MediaType; label: string }[] = [
-  { key: "all", label: "All" },
-  { key: "film", label: "Films" },
-  { key: "series", label: "Series" },
-  { key: "music", label: "Music" },
+const CATEGORIES: { key: CategoryFilter; label: string }[] = [
+  { key: "all", label: "Todos" },
+  { key: "film", label: "Filmes" },
+  { key: "series", label: "Séries" },
+  { key: "music", label: "Música" },
   { key: "anime", label: "Anime" },
-  { key: "manga", label: "Manga" },
-  { key: "book", label: "Books" },
+  { key: "manga", label: "Mangá" },
+  { key: "book", label: "Livros" },
 ];
 
 const MOCK_TRENDING = [
   {
     id: "t1",
-    title: "Hot New Releases",
+    title: "Lançamentos Quentes",
     imageUrl: "https://picsum.photos/seed/hot1/400/400",
     type: "film" as const,
   },
   {
     id: "t2",
-    title: "Popular This Week",
+    title: "Popular Esta Semana",
     imageUrl: "https://picsum.photos/seed/pop1/400/400",
     type: "music" as const,
   },
   {
     id: "t3",
-    title: "Rising Stars",
+    title: "Em Alta",
     imageUrl: "https://picsum.photos/seed/rise1/400/400",
     type: "anime" as const,
   },
 ];
 
-const MOCK_TOP_LISTS = [
+const MOCK_MEDIA_LIST: {
+  id: string;
+  title: string;
+  imageUrl: string;
+  type: MediaType;
+  year: string;
+  rating: number;
+  genre: string;
+  overview: string;
+  voteCount: number;
+}[] = [
   {
-    id: "l1",
-    title: "Top 250 Albums",
-    imageUrl: "https://picsum.photos/seed/album1/400/400",
-    type: "music" as const,
+    id: "m1",
+    title: "Harry Potter e a Pedra Filosofal",
+    imageUrl: "https://picsum.photos/seed/hp1/300/450",
+    type: "film",
+    year: "2001",
+    rating: 7.6,
+    genre: "Aventura, Fantasia",
+    overview: "Harry Potter, um garoto órfão, descobre que é um bruxo ao ser aceito na Escola de Magia e Bruxaria de Hogwarts.",
+    voteCount: 24500,
   },
   {
-    id: "l2",
-    title: "Top 250 Films",
-    imageUrl: "https://picsum.photos/seed/film1/400/400",
-    type: "film" as const,
-  },
-  {
-    id: "l3",
-    title: "Top 250 Anime",
-    imageUrl: "https://picsum.photos/seed/anime1/400/400",
-    type: "anime" as const,
-  },
-  {
-    id: "l4",
-    title: "Best Books 2024",
-    imageUrl: "https://picsum.photos/seed/book1/400/400",
-    type: "book" as const,
-  },
-];
-
-const MOCK_FOR_YOU = [
-  {
-    id: "f1",
-    title: "Yeezus",
-    imageUrl: "https://picsum.photos/seed/yeezus/400/400",
-    type: "music" as const,
-    rating: 4.5,
-  },
-  {
-    id: "f2",
-    title: "Blonde",
-    imageUrl: "https://picsum.photos/seed/blonde2/400/400",
-    type: "music" as const,
-    rating: 5,
-  },
-  {
-    id: "f3",
-    title: "IGOR",
-    imageUrl: "https://picsum.photos/seed/igor/400/400",
-    type: "music" as const,
-    rating: 4,
-  },
-  {
-    id: "f4",
+    id: "m2",
     title: "Attack on Titan",
-    imageUrl: "https://picsum.photos/seed/aot/400/400",
-    type: "anime" as const,
-    rating: 4.8,
+    imageUrl: "https://picsum.photos/seed/aot2/300/450",
+    type: "anime",
+    year: "2013",
+    rating: 8.5,
+    genre: "Ação, Drama, Fantasia",
+    overview: "Em um mundo dominado por Titãs gigantes que devoram humanos, Eren Yeager jura eliminá-los após perder sua mãe.",
+    voteCount: 18200,
+  },
+  {
+    id: "m3",
+    title: "Blonde",
+    imageUrl: "https://picsum.photos/seed/blonde3/300/450",
+    type: "music",
+    year: "2016",
+    rating: 9.0,
+    genre: "R&B, Art Pop",
+    overview: "Segundo álbum de estúdio de Frank Ocean, aclamado pela crítica como uma obra-prima do R&B contemporâneo.",
+    voteCount: 12800,
+  },
+  {
+    id: "m4",
+    title: "Breaking Bad",
+    imageUrl: "https://picsum.photos/seed/bb1/300/450",
+    type: "series",
+    year: "2008",
+    rating: 9.5,
+    genre: "Crime, Drama, Thriller",
+    overview: "Um professor de química do ensino médio diagnosticado com câncer se volta para a fabricação de metanfetamina.",
+    voteCount: 32100,
+  },
+  {
+    id: "m5",
+    title: "One Piece",
+    imageUrl: "https://picsum.photos/seed/op1/300/450",
+    type: "manga",
+    year: "1997",
+    rating: 9.2,
+    genre: "Aventura, Ação, Comédia",
+    overview: "Monkey D. Luffy e sua tripulação buscam o tesouro One Piece para se tornarem o Rei dos Piratas.",
+    voteCount: 28500,
+  },
+  {
+    id: "m6",
+    title: "Duna",
+    imageUrl: "https://picsum.photos/seed/dune2/300/450",
+    type: "book",
+    year: "1965",
+    rating: 8.8,
+    genre: "Ficção Científica",
+    overview: "No planeta desértico Arrakis, Paul Atreides enfrenta intrigas políticas e descobre seu destino épico.",
+    voteCount: 15600,
   },
 ];
 
@@ -118,11 +140,29 @@ export default function DiscoverScreen() {
   const { theme } = useTheme();
   const navigation =
     useNavigation<NativeStackNavigationProp<DiscoverStackParamList>>();
-  const [selectedCategory, setSelectedCategory] = useState<MediaType>("all");
+  const [selectedCategory, setSelectedCategory] = useState<CategoryFilter>("all");
 
   const handleSearch = () => {
     navigation.navigate("Search");
   };
+
+  const handleMediaPress = (item: typeof MOCK_MEDIA_LIST[0]) => {
+    navigation.navigate("MediaDetail", {
+      id: item.id,
+      title: item.title,
+      imageUrl: item.imageUrl,
+      type: item.type,
+      year: item.year,
+      rating: item.rating,
+      genre: item.genre,
+      overview: item.overview,
+      voteCount: item.voteCount,
+    });
+  };
+
+  const filteredMedia = selectedCategory === "all"
+    ? MOCK_MEDIA_LIST
+    : MOCK_MEDIA_LIST.filter((item) => item.type === selectedCategory);
 
   return (
     <ScrollView
@@ -152,7 +192,7 @@ export default function DiscoverScreen() {
           type="body"
           style={[styles.searchPlaceholder, { color: theme.textSecondary }]}
         >
-          Search...
+          Buscar...
         </ThemedText>
       </Pressable>
 
@@ -191,7 +231,7 @@ export default function DiscoverScreen() {
         ))}
       </ScrollView>
 
-      <SectionHeader title="Trending" />
+      <SectionHeader title="Em Alta" />
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -209,42 +249,22 @@ export default function DiscoverScreen() {
         ))}
       </ScrollView>
 
-      <SectionHeader title="Top Lists" />
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.horizontalList}
-      >
-        {MOCK_TOP_LISTS.map((item) => (
-          <MediaCard
-            key={item.id}
-            id={item.id}
-            title={item.title}
-            imageUrl={item.imageUrl}
-            type={item.type}
-            variant="gradient"
-          />
-        ))}
-      </ScrollView>
-
-      <SectionHeader title="For You" />
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.horizontalList}
-      >
-        {MOCK_FOR_YOU.map((item) => (
-          <MediaCard
-            key={item.id}
-            id={item.id}
-            title={item.title}
-            imageUrl={item.imageUrl}
-            type={item.type}
-            rating={item.rating}
-            variant="compact"
-          />
-        ))}
-      </ScrollView>
+      <SectionHeader title="Explorar Mídias" />
+      {filteredMedia.map((item) => (
+        <MediaCardFull
+          key={item.id}
+          id={item.id}
+          title={item.title}
+          imageUrl={item.imageUrl}
+          type={item.type}
+          year={item.year}
+          rating={item.rating}
+          genre={item.genre}
+          overview={item.overview}
+          voteCount={item.voteCount}
+          onPress={() => handleMediaPress(item)}
+        />
+      ))}
     </ScrollView>
   );
 }

@@ -12,6 +12,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { Feather } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { ThemedText } from "@/components/ThemedText";
 import { PostCard } from "@/components/PostCard";
@@ -21,6 +23,7 @@ import { EmptyState } from "@/components/EmptyState";
 import { Avatar } from "@/components/Avatar";
 import { useTheme } from "@/hooks/useTheme";
 import { Spacing, BorderRadius } from "@/constants/theme";
+import { HomeStackParamList } from "@/navigation/HomeStackNavigator";
 
 const MOCK_TRENDING = [
   {
@@ -96,6 +99,7 @@ export default function HomeScreen() {
   const headerHeight = useHeaderHeight();
   const tabBarHeight = useBottomTabBarHeight();
   const { theme } = useTheme();
+  const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>();
   const [refreshing, setRefreshing] = useState(false);
   const [posts, setPosts] = useState(MOCK_POSTS);
 
