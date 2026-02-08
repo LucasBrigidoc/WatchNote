@@ -76,7 +76,7 @@ export default function SignUpScreen() {
     >
       <View style={styles.header}>
         <Image
-          source={require("../../assets/images/logo.png")}
+          source={require("../../assets/logo_auth.png")}
           style={styles.logo}
           resizeMode="contain"
         />
