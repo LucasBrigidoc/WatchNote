@@ -27,7 +27,8 @@ interface MediaCardProps {
   variant?: "compact" | "full" | "gradient" | "minimal";
   showFullStars?: boolean;
   inlineStars?: boolean;
-  icon?: keyof typeof Feather.hasIcon | string;
+  icon?: any;
+  accentColor?: string;
 }
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
@@ -60,6 +61,7 @@ export function MediaCard({
   showFullStars = true,
   inlineStars = false,
   icon,
+  accentColor,
 }: MediaCardProps) {
   const { theme } = useTheme();
   const scale = useSharedValue(1);
@@ -77,26 +79,48 @@ export function MediaCard({
   };
 
   if (variant === "minimal") {
-    return (
-      <AnimatedPressable
-        onPress={onPress}
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
-        style={[
-          styles.minimalCard,
-          { backgroundColor: theme.card, borderColor: theme.border },
-          animatedStyle,
-        ]}
-      >
-        <View style={[styles.minimalIconContainer, { backgroundColor: theme.accent + "15" }]}>
-          <Feather name={(icon as any) || getIconForType(type)} size={20} color={theme.accent} />
+        <AnimatedPressable
+          onPress={onPress}
+          onPressIn={handlePressIn}
+          onPressOut={handlePressOut}
+          style={[
+            styles.minimalCard,
+            {
+              backgroundColor: theme.backgroundDefault,
+              borderColor: accentColor ? accentColor + "40" : theme.border,
+              borderWidth: accentColor ? 1.5 : 1,
+            },
+            animatedStyle,
+          ]}
+        >
+        <View
+          style={[
+            styles.minimalIconContainer,
+            { backgroundColor: (accentColor || theme.accent) + "20" },
+          ]}
+        >
+          <Feather
+            name={(icon as any) || getIconForType(type)}
+            size={22}
+            color={accentColor || theme.accent}
+          />
         </View>
         <View style={styles.minimalContent}>
-          <ThemedText type="body" style={styles.minimalTitle}>
+          <ThemedText
+            type="body"
+            style={[
+              styles.minimalTitle,
+              accentColor ? { color: accentColor, fontWeight: "700" } : null,
+            ]}
+          >
             {title}
           </ThemedText>
         </View>
-        <Feather name="chevron-right" size={16} color={theme.textSecondary} />
+        <Feather
+          name="chevron-right"
+          size={18}
+          color={accentColor || theme.textSecondary}
+        />
       </AnimatedPressable>
     );
   }
@@ -248,10 +272,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     padding: Spacing.md,
-    borderRadius: BorderRadius.lg,
+    borderRadius: BorderRadius.xl,
     marginRight: Spacing.md,
     borderWidth: 1,
     width: 280,
+    height: 72,
   },
   minimalIconContainer: {
     width: 40,
