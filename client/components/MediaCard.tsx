@@ -79,20 +79,21 @@ export function MediaCard({
   };
 
   if (variant === "minimal") {
-        <AnimatedPressable
-          onPress={onPress}
-          onPressIn={handlePressIn}
-          onPressOut={handlePressOut}
-          style={[
-            styles.minimalCard,
-            {
-              backgroundColor: theme.backgroundDefault,
-              borderColor: accentColor ? accentColor + "40" : theme.border,
-              borderWidth: accentColor ? 1.5 : 1,
-            },
-            animatedStyle,
-          ]}
-        >
+    return (
+      <AnimatedPressable
+        onPress={onPress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        style={[
+          styles.minimalCard,
+          {
+            backgroundColor: theme.backgroundDefault,
+            borderColor: accentColor ? accentColor + "40" : theme.border,
+            borderWidth: accentColor ? 1.5 : 1,
+          },
+          animatedStyle,
+        ]}
+      >
         <View
           style={[
             styles.minimalIconContainer,
