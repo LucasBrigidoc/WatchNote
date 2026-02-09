@@ -40,7 +40,7 @@ const MOCK_TRENDING = [
     imageUrl: "https://picsum.photos/seed/hot1/400/400",
     type: "film" as const,
     icon: "flame" as const,
-    color: "#FF4D00",
+    color: "#007AFF",
   },
   {
     id: "t2",
@@ -56,7 +56,7 @@ const MOCK_TRENDING = [
     imageUrl: "https://picsum.photos/seed/rise1/400/400",
     type: "anime" as const,
     icon: "star" as const,
-    color: "#FFD600",
+    color: "#007AFF",
   },
 ];
 

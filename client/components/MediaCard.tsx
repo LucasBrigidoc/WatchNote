@@ -101,7 +101,7 @@ export function MediaCard({
           ]}
         >
           <Feather
-            name={(icon as any) || getIconForType(type)}
+            name={icon === "flame" ? "zap" : ((icon as any) || getIconForType(type))}
             size={22}
             color={accentColor || theme.accent}
           />
