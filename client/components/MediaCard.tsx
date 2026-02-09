@@ -93,7 +93,7 @@ export function MediaCard({
           <ThemedText type="small" style={[styles.minimalType, { color: theme.accent }]}>
             {type.toUpperCase()}
           </ThemedText>
-          <ThemedText type="body" style={styles.minimalTitle} numberOfLines={1}>
+          <ThemedText type="body" style={styles.minimalTitle}>
             {title}
           </ThemedText>
         </View>
@@ -252,7 +252,7 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.lg,
     marginRight: Spacing.md,
     borderWidth: 1,
-    width: 220,
+    width: 280,
   },
   minimalIconContainer: {
     width: 40,
