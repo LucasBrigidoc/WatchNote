@@ -27,6 +27,7 @@ interface MediaCardProps {
   variant?: "compact" | "full" | "gradient" | "minimal";
   showFullStars?: boolean;
   inlineStars?: boolean;
+  icon?: keyof typeof Feather.hasIcon | string;
 }
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
@@ -58,6 +59,7 @@ export function MediaCard({
   variant = "compact",
   showFullStars = true,
   inlineStars = false,
+  icon,
 }: MediaCardProps) {
   const { theme } = useTheme();
   const scale = useSharedValue(1);
@@ -87,12 +89,9 @@ export function MediaCard({
         ]}
       >
         <View style={[styles.minimalIconContainer, { backgroundColor: theme.accent + "15" }]}>
-          <Feather name={getIconForType(type)} size={20} color={theme.accent} />
+          <Feather name={(icon as any) || getIconForType(type)} size={20} color={theme.accent} />
         </View>
         <View style={styles.minimalContent}>
-          <ThemedText type="small" style={[styles.minimalType, { color: theme.accent }]}>
-            {type.toUpperCase()}
-          </ThemedText>
           <ThemedText type="body" style={styles.minimalTitle}>
             {title}
           </ThemedText>

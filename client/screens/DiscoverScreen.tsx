@@ -39,18 +39,21 @@ const MOCK_TRENDING = [
     title: "Lançamentos Quentes",
     imageUrl: "https://picsum.photos/seed/hot1/400/400",
     type: "film" as const,
+    icon: "flame" as const,
   },
   {
     id: "t2",
     title: "Popular Esta Semana",
     imageUrl: "https://picsum.photos/seed/pop1/400/400",
     type: "music" as const,
+    icon: "trending-up" as const,
   },
   {
     id: "t3",
     title: "Em Alta",
     imageUrl: "https://picsum.photos/seed/rise1/400/400",
     type: "anime" as const,
+    icon: "star" as const,
   },
 ];
 
@@ -245,6 +248,7 @@ export default function DiscoverScreen() {
             imageUrl={item.imageUrl}
             type={item.type}
             variant="minimal"
+            icon={item.icon}
           />
         ))}
       </ScrollView>
