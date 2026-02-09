@@ -125,7 +125,7 @@ export default function HomeScreen() {
             title={item.title}
             imageUrl={item.imageUrl}
             type={item.type}
-            variant="gradient"
+            variant="minimal"
           />
         ))}
       </ScrollView>

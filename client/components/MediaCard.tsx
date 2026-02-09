@@ -7,6 +7,7 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
+import { Feather } from "@expo/vector-icons";
 
 import { ThemedText } from "@/components/ThemedText";
 import { MediaTypeBadge, MediaType } from "@/components/MediaTypeBadge";
@@ -23,12 +24,27 @@ interface MediaCardProps {
   rating?: number;
   duration?: string;
   onPress?: () => void;
-  variant?: "compact" | "full" | "gradient";
+  variant?: "compact" | "full" | "gradient" | "minimal";
   showFullStars?: boolean;
   inlineStars?: boolean;
 }
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
+const getIconForType = (type: MediaType) => {
+  switch (type) {
+    case "music":
+      return "music";
+    case "film":
+      return "film";
+    case "anime":
+      return "tv";
+    case "book":
+      return "book";
+    default:
+      return "grid";
+  }
+};
 
 export function MediaCard({
   id,
@@ -57,6 +73,34 @@ export function MediaCard({
   const handlePressOut = () => {
     scale.value = withSpring(1, { damping: 15 });
   };
+
+  if (variant === "minimal") {
+    return (
+      <AnimatedPressable
+        onPress={onPress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        style={[
+          styles.minimalCard,
+          { backgroundColor: theme.card, borderColor: theme.border },
+          animatedStyle,
+        ]}
+      >
+        <View style={[styles.minimalIconContainer, { backgroundColor: theme.accent + "15" }]}>
+          <Feather name={getIconForType(type)} size={20} color={theme.accent} />
+        </View>
+        <View style={styles.minimalContent}>
+          <ThemedText type="small" style={[styles.minimalType, { color: theme.accent }]}>
+            {type.toUpperCase()}
+          </ThemedText>
+          <ThemedText type="body" style={styles.minimalTitle} numberOfLines={1}>
+            {title}
+          </ThemedText>
+        </View>
+        <Feather name="chevron-right" size={16} color={theme.textSecondary} />
+      </AnimatedPressable>
+    );
+  }
 
   if (variant === "gradient") {
     return (
@@ -200,5 +244,35 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginTop: Spacing.xs,
     color: "#FFFFFF",
+  },
+  minimalCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: Spacing.md,
+    borderRadius: BorderRadius.lg,
+    marginRight: Spacing.md,
+    borderWidth: 1,
+    width: 220,
+  },
+  minimalIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: Spacing.md,
+  },
+  minimalContent: {
+    flex: 1,
+  },
+  minimalType: {
+    fontSize: 10,
+    fontWeight: "700",
+    letterSpacing: 0.5,
+    marginBottom: 2,
+  },
+  minimalTitle: {
+    fontSize: 14,
+    fontWeight: "600",
   },
 });
