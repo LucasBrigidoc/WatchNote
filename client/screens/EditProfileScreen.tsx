@@ -21,14 +21,12 @@ import { useTheme } from "@/hooks/useTheme";
 import { useAuth } from "@/contexts/AuthContext";
 import { authFetch } from "@/lib/api";
 import { Spacing, BorderRadius } from "@/constants/theme";
-import { useLanguage } from "@/i18n";
 
 export default function EditProfileScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const { theme } = useTheme();
   const { user, updateUser } = useAuth();
-  const { t } = useLanguage();
 
   const [name, setName] = useState(user?.name || "");
   const [email, setEmail] = useState(user?.email || "");
@@ -39,7 +37,7 @@ export default function EditProfileScreen() {
   const pickImage = async () => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permissionResult.granted) {
-      Alert.alert(t.editProfile.permissionRequired, t.editProfile.galleryPermission);
+      Alert.alert("Permissão necessária", "Precisamos de acesso à sua galeria para escolher uma foto.");
       return;
     }
 
@@ -65,11 +63,11 @@ export default function EditProfileScreen() {
 
   const handleSave = async () => {
     if (!name.trim()) {
-      Alert.alert(t.common.error, t.editProfile.nameRequired);
+      Alert.alert("Erro", "O nome não pode estar vazio.");
       return;
     }
     if (!email.trim()) {
-      Alert.alert(t.common.error, t.editProfile.emailRequired);
+      Alert.alert("Erro", "O email não pode estar vazio.");
       return;
     }
 
@@ -88,16 +86,16 @@ export default function EditProfileScreen() {
       const data = await res.json();
 
       if (!res.ok) {
-        Alert.alert(t.common.error, data.message || t.editProfile.saveError);
+        Alert.alert("Erro", data.message || "Erro ao salvar perfil");
         return;
       }
 
       updateUser(data.user);
-      Alert.alert(t.common.success, t.editProfile.profileUpdated, [
+      Alert.alert("Sucesso", "Perfil atualizado com sucesso!", [
         { text: "OK", onPress: () => navigation.goBack() },
       ]);
     } catch (error) {
-      Alert.alert(t.common.error, t.editProfile.saveError);
+      Alert.alert("Erro", "Erro ao salvar perfil. Tente novamente.");
     } finally {
       setSaving(false);
     }
@@ -115,7 +113,7 @@ export default function EditProfileScreen() {
         <Pressable onPress={() => navigation.goBack()} style={styles.backButton}>
           <Feather name="arrow-left" size={24} color={theme.text} />
         </Pressable>
-        <ThemedText type="h3">{t.editProfile.title}</ThemedText>
+        <ThemedText type="h3">Editar Perfil</ThemedText>
         <View style={{ width: 24 }} />
       </View>
 
@@ -132,7 +130,7 @@ export default function EditProfileScreen() {
         </Pressable>
         <Pressable onPress={pickImage}>
           <ThemedText type="small" style={{ color: theme.accent, marginTop: Spacing.sm }}>
-            {t.editProfile.changePhoto}
+            Alterar Foto
           </ThemedText>
         </Pressable>
       </View>
@@ -140,20 +138,20 @@ export default function EditProfileScreen() {
       <GlassCard style={styles.formCard}>
         <View style={styles.field}>
           <ThemedText type="small" style={[styles.label, { color: theme.textSecondary }]}>
-            {t.editProfile.name}
+            Nome
           </ThemedText>
           <TextInput
             style={[styles.input, { color: theme.text, borderColor: theme.border }]}
             value={name}
             onChangeText={setName}
-            placeholder={t.editProfile.name}
+            placeholder="Seu nome"
             placeholderTextColor={theme.textSecondary}
           />
         </View>
 
         <View style={styles.field}>
           <ThemedText type="small" style={[styles.label, { color: theme.textSecondary }]}>
-            {t.editProfile.emailLabel}
+            Email
           </ThemedText>
           <TextInput
             style={[styles.input, { color: theme.text, borderColor: theme.border }]}
@@ -168,13 +166,13 @@ export default function EditProfileScreen() {
 
         <View style={styles.field}>
           <ThemedText type="small" style={[styles.label, { color: theme.textSecondary }]}>
-            {t.editProfile.bioLabel}
+            Bio
           </ThemedText>
           <TextInput
             style={[styles.input, styles.bioInput, { color: theme.text, borderColor: theme.border }]}
             value={bio}
             onChangeText={setBio}
-            placeholder={t.editProfile.bioPlaceholder}
+            placeholder="Conte algo sobre você..."
             placeholderTextColor={theme.textSecondary}
             multiline
             numberOfLines={4}
@@ -192,7 +190,7 @@ export default function EditProfileScreen() {
           <ActivityIndicator color="#FFF" />
         ) : (
           <ThemedText type="body" style={{ color: "#FFF", fontWeight: "700" }}>
-            {t.editProfile.saveChanges}
+            Salvar Alterações
           </ThemedText>
         )}
       </Pressable>

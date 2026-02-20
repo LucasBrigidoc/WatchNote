@@ -21,9 +21,17 @@ import { useTheme } from "@/hooks/useTheme";
 import { Spacing, BorderRadius } from "@/constants/theme";
 import { TextInput } from "@/components/TextInput";
 import { authFetch } from "@/lib/api";
-import { useLanguage } from "@/i18n";
 
 type MediaTypeOption = "film" | "series" | "music" | "anime" | "manga" | "book";
+
+const MEDIA_TYPES: { key: MediaTypeOption; label: string; icon: string }[] = [
+  { key: "film", label: "Film", icon: "film" },
+  { key: "series", label: "Series", icon: "tv" },
+  { key: "music", label: "Music", icon: "music" },
+  { key: "anime", label: "Anime", icon: "play-circle" },
+  { key: "manga", label: "Manga", icon: "book-open" },
+  { key: "book", label: "Book", icon: "book" },
+];
 
 const MOCK_SEARCH_RESULTS = [
   {

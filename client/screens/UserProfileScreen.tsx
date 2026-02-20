@@ -22,7 +22,6 @@ import { useTheme } from "@/hooks/useTheme";
 import { Spacing, BorderRadius } from "@/constants/theme";
 import { authFetch } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
-import { useLanguage } from "@/i18n";
 
 export type UserProfileParams = {
   userId: string;

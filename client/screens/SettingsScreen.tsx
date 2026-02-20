@@ -23,7 +23,6 @@ import { useTheme } from "@/hooks/useTheme";
 import { useAuth } from "@/contexts/AuthContext";
 import { authFetch } from "@/lib/api";
 import { Spacing, BorderRadius } from "@/constants/theme";
-import { useLanguage } from "@/i18n";
 import type { ProfileStackParamList } from "@/navigation/ProfileStackNavigator";
 
 interface SettingRowProps {
@@ -93,27 +92,26 @@ export default function SettingsScreen() {
   const { theme } = useTheme();
   const { user, logout } = useAuth();
   const navigation = useNavigation<NativeStackNavigationProp<ProfileStackParamList>>();
-  const { t, language, setLanguage } = useLanguage();
   const [notifications, setNotifications] = useState(true);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deletePassword, setDeletePassword] = useState("");
   const [deleting, setDeleting] = useState(false);
 
   const handleLogout = () => {
-    Alert.alert(t.settings.logOut, t.settings.logOutConfirm, [
-      { text: t.common.cancel, style: "cancel" },
-      { text: t.settings.logOut, style: "destructive", onPress: logout },
+    Alert.alert("Sair", "Tem certeza que deseja sair?", [
+      { text: "Cancelar", style: "cancel" },
+      { text: "Sair", style: "destructive", onPress: logout },
     ]);
   };
 
   const handleDeleteAccount = () => {
     Alert.alert(
-      t.settings.deleteAccount,
-      t.settings.deleteAccountWarning,
+      "Excluir Conta",
+      "Esta ação não pode ser desfeita. Todos os seus dados serão permanentemente excluídos.",
       [
-        { text: t.common.cancel, style: "cancel" },
+        { text: "Cancelar", style: "cancel" },
         {
-          text: t.common.continue,
+          text: "Continuar",
           style: "destructive",
           onPress: () => {
             setDeletePassword("");
@@ -124,17 +122,9 @@ export default function SettingsScreen() {
     );
   };
 
-  const handleLanguage = () => {
-    Alert.alert(t.settings.selectLanguage, "", [
-      { text: t.settings.portuguese, onPress: () => setLanguage("pt") },
-      { text: t.settings.english, onPress: () => setLanguage("en") },
-      { text: t.common.cancel, style: "cancel" },
-    ]);
-  };
-
   const confirmDeleteAccount = async () => {
     if (!deletePassword) {
-      Alert.alert(t.common.error, t.settings.enterPasswordToDelete);
+      Alert.alert("Erro", "Digite sua senha para confirmar.");
       return;
     }
 
@@ -148,14 +138,14 @@ export default function SettingsScreen() {
       const data = await res.json();
 
       if (!res.ok) {
-        Alert.alert(t.common.error, data.message || t.settings.deleteAccount);
+        Alert.alert("Erro", data.message || "Erro ao excluir conta");
         return;
       }
 
       setShowDeleteModal(false);
       await logout();
     } catch (error) {
-      Alert.alert(t.common.error, t.settings.deleteAccount);
+      Alert.alert("Erro", "Erro ao excluir conta. Tente novamente.");
     } finally {
       setDeleting(false);
     }
@@ -192,21 +182,21 @@ export default function SettingsScreen() {
         type="small"
         style={[styles.sectionTitle, { color: theme.textSecondary }]}
       >
-        {t.settings.account}
+        CONTA
       </ThemedText>
       <GlassCard noPadding style={styles.section}>
-        <SettingRow icon="user" label={t.settings.editProfile} onPress={() => navigation.navigate("EditProfile")} />
+        <SettingRow icon="user" label="Editar Perfil" onPress={() => navigation.navigate("EditProfile")} />
         <View style={[styles.divider, { backgroundColor: theme.border }]} />
-        <SettingRow icon="lock" label={t.settings.changePassword} onPress={() => navigation.navigate("ChangePassword")} />
+        <SettingRow icon="lock" label="Alterar Senha" onPress={() => navigation.navigate("ChangePassword")} />
         <View style={[styles.divider, { backgroundColor: theme.border }]} />
-        <SettingRow icon="link" label={t.settings.connectedAccounts} value={t.settings.none} />
+        <SettingRow icon="link" label="Contas Conectadas" value="Nenhuma" />
       </GlassCard>
 
       <ThemedText
         type="small"
         style={[styles.sectionTitle, { color: theme.textSecondary }]}
       >
-        {t.settings.preferences}
+        PREFERÊNCIAS
       </ThemedText>
       <GlassCard noPadding style={styles.section}>
         <View style={styles.settingRow}>
@@ -219,7 +209,7 @@ export default function SettingsScreen() {
             <Feather name="bell" size={18} color={theme.accent} />
           </View>
           <View style={styles.settingContent}>
-            <ThemedText type="body">{t.settings.notifications}</ThemedText>
+            <ThemedText type="body">Notificações</ThemedText>
           </View>
           <Switch
             value={notifications}
@@ -232,33 +222,33 @@ export default function SettingsScreen() {
           />
         </View>
         <View style={[styles.divider, { backgroundColor: theme.border }]} />
-        <SettingRow icon="globe" label={t.settings.language} value={language === "pt" ? t.settings.portuguese : t.settings.english} onPress={handleLanguage} />
+        <SettingRow icon="globe" label="Idioma" value="Português" />
       </GlassCard>
 
       <ThemedText
         type="small"
         style={[styles.sectionTitle, { color: theme.textSecondary }]}
       >
-        {t.settings.about}
+        SOBRE
       </ThemedText>
       <GlassCard noPadding style={styles.section}>
-        <SettingRow icon="info" label={t.settings.aboutApp} />
+        <SettingRow icon="info" label="Sobre o WatchFile" />
         <View style={[styles.divider, { backgroundColor: theme.border }]} />
-        <SettingRow icon="file-text" label={t.settings.termsOfService} />
+        <SettingRow icon="file-text" label="Termos de Uso" />
         <View style={[styles.divider, { backgroundColor: theme.border }]} />
-        <SettingRow icon="shield" label={t.settings.privacyPolicy} />
+        <SettingRow icon="shield" label="Política de Privacidade" />
       </GlassCard>
 
       <ThemedText
         type="small"
         style={[styles.sectionTitle, { color: theme.textSecondary }]}
       >
-        {t.settings.dangerZone}
+        ZONA DE PERIGO
       </ThemedText>
       <GlassCard noPadding style={styles.section}>
         <SettingRow
           icon="log-out"
-          label={t.settings.logOut}
+          label="Sair"
           showArrow={false}
           onPress={handleLogout}
           danger
@@ -266,7 +256,7 @@ export default function SettingsScreen() {
         <View style={[styles.divider, { backgroundColor: theme.border }]} />
         <SettingRow
           icon="trash-2"
-          label={t.settings.deleteAccount}
+          label="Excluir Conta"
           showArrow={false}
           onPress={handleDeleteAccount}
           danger
@@ -277,7 +267,7 @@ export default function SettingsScreen() {
         type="small"
         style={[styles.version, { color: theme.textSecondary }]}
       >
-        {`${t.common.version} 1.0.0`}
+        Versão 1.0.0
       </ThemedText>
 
       <Modal
@@ -289,16 +279,16 @@ export default function SettingsScreen() {
         <View style={styles.modalOverlay}>
           <GlassCard style={styles.modalContent}>
             <ThemedText type="h4" style={{ marginBottom: Spacing.sm }}>
-              {t.settings.confirmDeletion}
+              Confirmar Exclusão
             </ThemedText>
             <ThemedText type="small" style={{ color: theme.textSecondary, marginBottom: Spacing.lg }}>
-              {t.settings.enterPasswordToDelete}
+              Digite sua senha para confirmar a exclusão permanente da sua conta.
             </ThemedText>
             <TextInput
               style={[styles.modalInput, { color: theme.text, borderColor: theme.border }]}
               value={deletePassword}
               onChangeText={setDeletePassword}
-              placeholder={t.settings.yourPassword}
+              placeholder="Sua senha"
               placeholderTextColor={theme.textSecondary}
               secureTextEntry
             />
@@ -307,7 +297,7 @@ export default function SettingsScreen() {
                 onPress={() => setShowDeleteModal(false)}
                 style={[styles.modalButton, { borderColor: theme.border, borderWidth: 1 }]}
               >
-                <ThemedText type="body">{t.common.cancel}</ThemedText>
+                <ThemedText type="body">Cancelar</ThemedText>
               </Pressable>
               <Pressable
                 onPress={confirmDeleteAccount}
@@ -318,7 +308,7 @@ export default function SettingsScreen() {
                   <ActivityIndicator color="#FFF" size="small" />
                 ) : (
                   <ThemedText type="body" style={{ color: "#FFF", fontWeight: "700" }}>
-                    {t.common.delete}
+                    Excluir
                   </ThemedText>
                 )}
               </Pressable>

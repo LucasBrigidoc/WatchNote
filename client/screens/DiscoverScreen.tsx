@@ -20,9 +20,18 @@ import { useTheme } from "@/hooks/useTheme";
 import { Spacing, BorderRadius } from "@/constants/theme";
 import { DiscoverStackParamList } from "@/navigation/DiscoverStackNavigator";
 import { MediaType } from "@/components/MediaTypeBadge";
-import { useLanguage } from "@/i18n";
 
 type CategoryFilter = "all" | "film" | "series" | "music" | "anime" | "manga" | "book";
+
+const CATEGORIES: { key: CategoryFilter; label: string }[] = [
+  { key: "all", label: "Todos" },
+  { key: "film", label: "Filmes" },
+  { key: "series", label: "Séries" },
+  { key: "music", label: "Música" },
+  { key: "anime", label: "Anime" },
+  { key: "manga", label: "Mangá" },
+  { key: "book", label: "Livros" },
+];
 
 const MOCK_TRENDING = [
   {
@@ -135,20 +144,9 @@ export default function DiscoverScreen() {
   const headerHeight = useHeaderHeight();
   const tabBarHeight = useBottomTabBarHeight();
   const { theme } = useTheme();
-  const { t } = useLanguage();
   const navigation =
     useNavigation<NativeStackNavigationProp<DiscoverStackParamList>>();
   const [selectedCategory, setSelectedCategory] = useState<CategoryFilter>("all");
-
-  const CATEGORIES_TRANSLATED: { key: CategoryFilter; label: string }[] = [
-    { key: "all", label: t.common.all },
-    { key: "film", label: t.categories.film },
-    { key: "series", label: t.categories.series },
-    { key: "music", label: t.categories.music },
-    { key: "anime", label: t.categories.anime },
-    { key: "manga", label: t.categories.manga },
-    { key: "book", label: t.categories.book },
-  ];
 
   const handleSearch = () => {
     navigation.navigate("Search");
@@ -200,7 +198,7 @@ export default function DiscoverScreen() {
           type="body"
           style={[styles.searchPlaceholder, { color: theme.textSecondary }]}
         >
-          {t.search.placeholder}
+          Buscar...
         </ThemedText>
       </Pressable>
 
@@ -209,7 +207,7 @@ export default function DiscoverScreen() {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.categories}
       >
-        {CATEGORIES_TRANSLATED.map((cat) => (
+        {CATEGORIES.map((cat) => (
           <Pressable
             key={cat.key}
             onPress={() => setSelectedCategory(cat.key)}
@@ -239,7 +237,7 @@ export default function DiscoverScreen() {
         ))}
       </ScrollView>
 
-      <SectionHeader title={t.discover.trending} />
+      <SectionHeader title="Em Alta" />
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -259,7 +257,7 @@ export default function DiscoverScreen() {
         ))}
       </ScrollView>
 
-      <SectionHeader title={t.discover.exploreMedia} />
+      <SectionHeader title="Explorar Mídias" />
       {filteredMedia.map((item) => (
         <MediaCardFull
           key={item.id}

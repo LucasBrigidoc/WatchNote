@@ -27,7 +27,6 @@ import { useTheme } from "@/hooks/useTheme";
 import { Spacing, BorderRadius } from "@/constants/theme";
 import { useAuth } from "@/contexts/AuthContext";
 import { authFetch } from "@/lib/api";
-import { useLanguage } from "@/i18n";
 
 type ProfileTab = "posts" | "reviews" | "lists" | "republicados";
 
@@ -38,13 +37,13 @@ const TABS: { key: ProfileTab; icon: string }[] = [
   { key: "republicados", icon: "repeat" },
 ];
 
-const CATEGORY_ICONS: Record<string, string> = {
-  film: "film",
-  series: "tv",
-  music: "music",
-  anime: "monitor",
-  manga: "book-open",
-  book: "book",
+const CATEGORY_LABELS: Record<string, { label: string; icon: string }> = {
+  film: { label: "Filme", icon: "film" },
+  series: { label: "Série", icon: "tv" },
+  music: { label: "Música", icon: "music" },
+  anime: { label: "Anime", icon: "monitor" },
+  manga: { label: "Manga", icon: "book-open" },
+  book: { label: "Livro", icon: "book" },
 };
 
 interface Favorite {
@@ -96,7 +95,6 @@ export default function ProfileScreen() {
   const headerHeight = useHeaderHeight();
   const tabBarHeight = useBottomTabBarHeight();
   const { theme } = useTheme();
-  const { t } = useLanguage();
   const navigation = useNavigation<NativeStackNavigationProp<ProfileStackParamList>>();
   const [activeTab, setActiveTab] = useState<ProfileTab>("reviews");
 
@@ -114,7 +112,7 @@ export default function ProfileScreen() {
   const [showCreateList, setShowCreateList] = useState(false);
 
   const name = user?.name || "User";
-  const bio = user?.bio || t.profile.noBioYet;
+  const bio = user?.bio || "Nenhuma bio ainda";
   const avatarUrl = user?.avatarUrl;
 
   const fetchProfileData = useCallback(async () => {
@@ -171,11 +169,11 @@ export default function ProfileScreen() {
   const maxCount = Math.max(...stats.distribution.map(d => d.count), 1);
 
   const allCategories = [
-    { key: "film", label: t.categories.film, icon: "film" },
-    { key: "series", label: t.categories.series, icon: "tv" },
-    { key: "music", label: t.categories.music, icon: "music" },
-    { key: "anime", label: t.categories.anime, icon: "monitor" },
-    { key: "book", label: t.categories.book, icon: "book" },
+    { key: "film", label: "Filme", icon: "film" },
+    { key: "series", label: "Série", icon: "tv" },
+    { key: "music", label: "Música", icon: "music" },
+    { key: "anime", label: "Anime", icon: "monitor" },
+    { key: "book", label: "Livro", icon: "book" },
   ];
 
   const favCategories = allCategories.map(cat => {
@@ -194,14 +192,14 @@ export default function ProfileScreen() {
     return (
       <View style={styles.statsSection}>
         <GlassCard style={styles.statsCard}>
-          <ThemedText type="body" style={styles.statsTitle}>{t.profile.bio}</ThemedText>
+          <ThemedText type="body" style={styles.statsTitle}>Bio</ThemedText>
           <ThemedText type="small" style={{ color: theme.textSecondary }}>
             {bio}
           </ThemedText>
         </GlassCard>
 
         <GlassCard style={styles.statsCard}>
-          <ThemedText type="body" style={styles.statsTitle}>{t.profile.myFavorites}</ThemedText>
+          <ThemedText type="body" style={styles.statsTitle}>Meus Favoritos</ThemedText>
           {favCategories.map((item) => (
             <View key={item.key} style={styles.favoriteRow}>
               <View style={styles.favoriteLabel}>
@@ -214,7 +212,7 @@ export default function ProfileScreen() {
         </GlassCard>
 
         <GlassCard style={styles.statsCard}>
-          <ThemedText type="body" style={styles.statsTitle}>{t.profile.ratings}</ThemedText>
+          <ThemedText type="body" style={styles.statsTitle}>Avaliações</ThemedText>
           {stats.distribution.map((item) => (
             <View key={item.stars} style={styles.ratingRow}>
               <View style={styles.starsLabel}>
@@ -239,7 +237,7 @@ export default function ProfileScreen() {
 
         <GlassCard style={styles.statsCard}>
           <View style={{ marginBottom: Spacing.md }}>
-            <ThemedText type="body" style={{ fontWeight: "600" }}>{t.profile.categoryCount}</ThemedText>
+            <ThemedText type="body" style={{ fontWeight: "600" }}>Quantidade por Categoria</ThemedText>
           </View>
           <View style={styles.statsGrid}>
             {categoryStatsDisplay.map((item) => (
@@ -258,7 +256,7 @@ export default function ProfileScreen() {
                 <Feather name="bar-chart-2" size={16} color={theme.accent} />
               </View>
               <View style={styles.statInfo}>
-                <ThemedText type="small" style={{ color: theme.textSecondary }}>{t.common.total}</ThemedText>
+                <ThemedText type="small" style={{ color: theme.textSecondary }}>Total</ThemedText>
                 <ThemedText type="body" style={styles.statCount}>{totalCategoryCount}</ThemedText>
               </View>
             </View>
@@ -283,8 +281,8 @@ export default function ProfileScreen() {
           return (
             <EmptyState
               type="posts"
-              title={t.profile.noPostsYet}
-              message={t.profile.shareOpinions}
+              title="Nenhum post ainda"
+              message="Compartilhe suas opiniões sobre o que você está consumindo."
             />
           );
         }
@@ -357,13 +355,13 @@ export default function ProfileScreen() {
               </View>
               <View style={styles.createListText}>
                 <ThemedText type="body" style={{ fontWeight: "600" }}>
-                  {t.profile.createNewList}
+                  Criar Nova Lista
                 </ThemedText>
                 <ThemedText
                   type="small"
                   style={{ color: theme.textSecondary }}
                 >
-                  {t.profile.organizeFavorites}
+                  Organize suas mídias favoritas
                 </ThemedText>
               </View>
             </Pressable>
@@ -396,7 +394,7 @@ export default function ProfileScreen() {
                           type="small"
                           style={{ color: theme.textSecondary }}
                         >
-                          {list.itemCount} {t.common.items}
+                          {list.itemCount} itens
                         </ThemedText>
                       </View>
                       <Feather
@@ -411,8 +409,8 @@ export default function ProfileScreen() {
             ) : (
               <EmptyState
                 type="lists"
-                title={t.profile.noListsYet}
-                message={t.profile.createListsMessage}
+                title="Nenhuma lista ainda"
+                message="Crie listas personalizadas para organizar suas mídias."
               />
             )}
           </View>
@@ -422,8 +420,8 @@ export default function ProfileScreen() {
         return (
           <EmptyState
             type="status"
-            title={t.profile.noUpdates}
-            message={t.profile.trackStatus}
+            title="Nenhuma atualização"
+            message="Marque mídias como 'Quero', 'Consumindo' ou 'Completo' para acompanhar aqui."
           />
         );
 
@@ -462,9 +460,9 @@ export default function ProfileScreen() {
           </ThemedText>
 
           <View style={styles.statsHeader}>
-            <StatCard value={totalRatings} label={t.profile.reviews} />
-            <StatCard value={followerCount} label={t.profile.followers} />
-            <StatCard value={followingCount} label={t.profile.following} />
+            <StatCard value={totalRatings} label="Reviews" />
+            <StatCard value={followerCount} label="Seguidores" />
+            <StatCard value={followingCount} label="Seguindo" />
           </View>
         </View>
 

@@ -17,13 +17,11 @@ import { GlassCard } from "@/components/GlassCard";
 import { useTheme } from "@/hooks/useTheme";
 import { authFetch } from "@/lib/api";
 import { Spacing, BorderRadius } from "@/constants/theme";
-import { useLanguage } from "@/i18n";
 
 export default function ChangePasswordScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const { theme } = useTheme();
-  const { t } = useLanguage();
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -35,19 +33,19 @@ export default function ChangePasswordScreen() {
 
   const handleSave = async () => {
     if (!currentPassword) {
-      Alert.alert(t.common.error, t.changePassword.enterCurrent);
+      Alert.alert("Erro", "Digite sua senha atual.");
       return;
     }
     if (!newPassword) {
-      Alert.alert(t.common.error, t.changePassword.enterNew);
+      Alert.alert("Erro", "Digite a nova senha.");
       return;
     }
     if (newPassword.length < 6) {
-      Alert.alert(t.common.error, t.changePassword.minChars);
+      Alert.alert("Erro", "A nova senha deve ter pelo menos 6 caracteres.");
       return;
     }
     if (newPassword !== confirmPassword) {
-      Alert.alert(t.common.error, t.changePassword.noMatch);
+      Alert.alert("Erro", "As senhas não coincidem.");
       return;
     }
 
@@ -61,15 +59,15 @@ export default function ChangePasswordScreen() {
       const data = await res.json();
 
       if (!res.ok) {
-        Alert.alert(t.common.error, data.message || t.changePassword.changeError);
+        Alert.alert("Erro", data.message || "Erro ao alterar senha");
         return;
       }
 
-      Alert.alert(t.common.success, t.changePassword.changed, [
+      Alert.alert("Sucesso", "Senha alterada com sucesso!", [
         { text: "OK", onPress: () => navigation.goBack() },
       ]);
     } catch (error) {
-      Alert.alert(t.common.error, t.changePassword.changeError);
+      Alert.alert("Erro", "Erro ao alterar senha. Tente novamente.");
     } finally {
       setSaving(false);
     }
@@ -87,21 +85,21 @@ export default function ChangePasswordScreen() {
         <Pressable onPress={() => navigation.goBack()} style={styles.backButton}>
           <Feather name="arrow-left" size={24} color={theme.text} />
         </Pressable>
-        <ThemedText type="h3">{t.changePassword.title}</ThemedText>
+        <ThemedText type="h3">Alterar Senha</ThemedText>
         <View style={{ width: 24 }} />
       </View>
 
       <GlassCard style={styles.formCard}>
         <View style={styles.field}>
           <ThemedText type="small" style={[styles.label, { color: theme.textSecondary }]}>
-            {t.changePassword.currentPassword}
+            Senha Atual
           </ThemedText>
           <View style={styles.passwordRow}>
             <TextInput
               style={[styles.input, styles.passwordInput, { color: theme.text, borderColor: theme.border }]}
               value={currentPassword}
               onChangeText={setCurrentPassword}
-              placeholder={t.changePassword.enterCurrent}
+              placeholder="Digite sua senha atual"
               placeholderTextColor={theme.textSecondary}
               secureTextEntry={!showCurrent}
             />
@@ -113,14 +111,14 @@ export default function ChangePasswordScreen() {
 
         <View style={styles.field}>
           <ThemedText type="small" style={[styles.label, { color: theme.textSecondary }]}>
-            {t.changePassword.newPassword}
+            Nova Senha
           </ThemedText>
           <View style={styles.passwordRow}>
             <TextInput
               style={[styles.input, styles.passwordInput, { color: theme.text, borderColor: theme.border }]}
               value={newPassword}
               onChangeText={setNewPassword}
-              placeholder={t.changePassword.minChars}
+              placeholder="Mínimo 6 caracteres"
               placeholderTextColor={theme.textSecondary}
               secureTextEntry={!showNew}
             />
@@ -132,14 +130,14 @@ export default function ChangePasswordScreen() {
 
         <View style={styles.field}>
           <ThemedText type="small" style={[styles.label, { color: theme.textSecondary }]}>
-            {t.changePassword.confirmNew}
+            Confirmar Nova Senha
           </ThemedText>
           <View style={styles.passwordRow}>
             <TextInput
               style={[styles.input, styles.passwordInput, { color: theme.text, borderColor: theme.border }]}
               value={confirmPassword}
               onChangeText={setConfirmPassword}
-              placeholder={t.changePassword.confirmNew}
+              placeholder="Repita a nova senha"
               placeholderTextColor={theme.textSecondary}
               secureTextEntry={!showConfirm}
             />
@@ -159,7 +157,7 @@ export default function ChangePasswordScreen() {
           <ActivityIndicator color="#FFF" />
         ) : (
           <ThemedText type="body" style={{ color: "#FFF", fontWeight: "700" }}>
-            {t.changePassword.changeButton}
+            Alterar Senha
           </ThemedText>
         )}
       </Pressable>

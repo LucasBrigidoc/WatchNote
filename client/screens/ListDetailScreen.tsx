@@ -21,7 +21,6 @@ import { TextInput } from "@/components/TextInput";
 import { useTheme } from "@/hooks/useTheme";
 import { Spacing, BorderRadius } from "@/constants/theme";
 import { authFetch } from "@/lib/api";
-import { useLanguage } from "@/i18n";
 
 interface ListItem {
   id: string;
