@@ -20,6 +20,7 @@ import { queryClient } from "@/lib/query-client";
 import RootStackNavigator from "@/navigation/RootStackNavigator";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { LanguageProvider } from "@/i18n";
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -45,6 +46,7 @@ export default function App() {
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
+        <LanguageProvider>
         <AuthProvider>
           <SafeAreaProvider onLayout={onLayoutRootView}>
             <GestureHandlerRootView style={styles.root}>
@@ -57,6 +59,7 @@ export default function App() {
             </GestureHandlerRootView>
           </SafeAreaProvider>
         </AuthProvider>
+        </LanguageProvider>
       </QueryClientProvider>
     </ErrorBoundary>
   );

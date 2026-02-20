@@ -24,6 +24,7 @@ import { Avatar } from "@/components/Avatar";
 import { useTheme } from "@/hooks/useTheme";
 import { Spacing, BorderRadius } from "@/constants/theme";
 import { HomeStackParamList } from "@/navigation/HomeStackNavigator";
+import { useLanguage } from "@/i18n";
 
 const MOCK_TRENDING = [
   {
@@ -99,6 +100,7 @@ export default function HomeScreen() {
   const headerHeight = useHeaderHeight();
   const tabBarHeight = useBottomTabBarHeight();
   const { theme } = useTheme();
+  const { t } = useLanguage();
   const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>();
   const [refreshing, setRefreshing] = useState(false);
   const [posts, setPosts] = useState(MOCK_POSTS);
@@ -112,7 +114,7 @@ export default function HomeScreen() {
 
   const renderHeader = () => (
     <View style={styles.headerContent}>
-      <SectionHeader title="Popular This Week" />
+      <SectionHeader title={t.home.popularThisWeek} />
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -130,7 +132,7 @@ export default function HomeScreen() {
         ))}
       </ScrollView>
 
-      <SectionHeader title="Timeline" rightLabel="Popular" />
+      <SectionHeader title={t.home.timeline} rightLabel={t.home.popular} />
     </View>
   );
 
@@ -176,8 +178,8 @@ export default function HomeScreen() {
       ListEmptyComponent={
         <EmptyState
           type="timeline"
-          title="No posts yet"
-          message="Start following users or create your first post to see content here."
+          title={t.home.noPostsTitle}
+          message={t.home.noPostsMessage}
         />
       }
       refreshControl={

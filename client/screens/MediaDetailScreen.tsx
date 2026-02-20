@@ -23,6 +23,7 @@ import { CreateListModal } from "@/components/CreateListModal";
 import { useTheme } from "@/hooks/useTheme";
 import { Spacing, BorderRadius, Shadows } from "@/constants/theme";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLanguage } from "@/i18n";
 
 export type MediaDetailParams = {
   id: string;

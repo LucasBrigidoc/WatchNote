@@ -26,20 +26,9 @@ import { TextInput } from "@/components/TextInput";
 import { DiscoverStackParamList } from "@/navigation/DiscoverStackNavigator";
 import { authFetch } from "@/lib/api";
 import { getApiUrl } from "@/lib/query-client";
+import { useLanguage } from "@/i18n";
 
 type FilterType = "all" | "film" | "series" | "music" | "anime" | "manga" | "book" | "profiles" | "lists";
-
-const FILTERS: { key: FilterType; label: string }[] = [
-  { key: "all", label: "All" },
-  { key: "film", label: "Films" },
-  { key: "series", label: "Series" },
-  { key: "music", label: "Music" },
-  { key: "anime", label: "Anime" },
-  { key: "manga", label: "Manga" },
-  { key: "book", label: "Books" },
-  { key: "profiles", label: "Perfis" },
-  { key: "lists", label: "Listas" },
-];
 
 const TMDB_GENRES: Record<number, string> = {
   28: "Ação", 12: "Aventura", 16: "Animação", 35: "Comédia", 80: "Crime",
@@ -56,6 +45,7 @@ export default function SearchScreen() {
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
   const { theme } = useTheme();
+  const { t } = useLanguage();
   const navigation = useNavigation<NativeStackNavigationProp<DiscoverStackParamList>>();
   const inputRef = useRef<RNTextInput>(null);
   const [query, setQuery] = useState("");
@@ -65,6 +55,18 @@ export default function SearchScreen() {
   const [userResults, setUserResults] = useState<any[]>([]);
   const [listResults, setListResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+
+  const FILTERS_TRANSLATED = [
+    { key: "all" as FilterType, label: t.common.all },
+    { key: "film" as FilterType, label: t.categories.film },
+    { key: "series" as FilterType, label: t.categories.series },
+    { key: "music" as FilterType, label: t.categories.music },
+    { key: "anime" as FilterType, label: t.categories.anime },
+    { key: "manga" as FilterType, label: t.categories.manga },
+    { key: "book" as FilterType, label: t.categories.book },
+    { key: "profiles" as FilterType, label: t.search.profiles },
+    { key: "lists" as FilterType, label: t.search.lists },
+  ];
 
   const searchAll = async (searchQuery: string) => {
     if (!searchQuery.trim()) {
@@ -267,7 +269,7 @@ export default function SearchScreen() {
           )}
           <View style={styles.userCardInfo}>
             <ThemedText type="body" style={{ fontWeight: "600" }}>{item.name}</ThemedText>
-            <ThemedText type="small" style={{ color: theme.textSecondary }}>por {item.userName} · {item.itemCount} itens</ThemedText>
+            <ThemedText type="small" style={{ color: theme.textSecondary }}>{t.search.by} {item.userName} · {item.itemCount} {t.common.items}</ThemedText>
           </View>
           <Feather name="chevron-right" size={20} color={theme.textSecondary} />
         </View>
@@ -290,8 +292,8 @@ export default function SearchScreen() {
       return (
         <EmptyState
           type="search"
-          title="Search for anything"
-          message="Find films, series, music, anime, manga, books, profiles, and lists."
+          title={t.search.searchForAnything}
+          message={t.search.searchMessage}
         />
       );
     }
@@ -301,7 +303,7 @@ export default function SearchScreen() {
       return (
         <EmptyState
           type="search"
-          title="No results found"
+          title={t.search.noResults}
           message={`We couldn't find anything matching "${query}". Try different keywords.`}
         />
       );
@@ -338,7 +340,7 @@ export default function SearchScreen() {
           value={query}
           onChangeText={setQuery}
           onSubmitEditing={handleSearch}
-          placeholder="Search..."
+          placeholder={t.search.placeholder}
           icon={<Feather name="search" size={20} color={theme.textSecondary} />}
           autoFocus
           returnKeyType="search"
@@ -352,7 +354,7 @@ export default function SearchScreen() {
         />
 
         <View style={styles.filters}>
-          {FILTERS.map((filter) => (
+          {FILTERS_TRANSLATED.map((filter) => (
             <Pressable
               key={filter.key}
               onPress={() => setSelectedFilter(filter.key)}
