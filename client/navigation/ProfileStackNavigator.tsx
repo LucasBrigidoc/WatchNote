@@ -9,6 +9,7 @@ import ProfileScreen from "@/screens/ProfileScreen";
 import SettingsScreen from "@/screens/SettingsScreen";
 import ListDetailScreen from "@/screens/ListDetailScreen";
 import MediaDetailScreen, { MediaDetailParams } from "@/screens/MediaDetailScreen";
+import UserProfileScreen, { UserProfileParams } from "@/screens/UserProfileScreen";
 import { useScreenOptions } from "@/hooks/useScreenOptions";
 import { useTheme } from "@/hooks/useTheme";
 
@@ -17,6 +18,7 @@ export type ProfileStackParamList = {
   Settings: undefined;
   ListDetail: { listId: string };
   MediaDetail: MediaDetailParams;
+  UserProfile: UserProfileParams;
 };
 
 const Stack = createNativeStackNavigator<ProfileStackParamList>();
@@ -70,6 +72,14 @@ export default function ProfileStackNavigator() {
       <Stack.Screen
         name="MediaDetail"
         component={MediaDetailScreen}
+        options={{
+          headerShown: false,
+          animation: "slide_from_right",
+        }}
+      />
+      <Stack.Screen
+        name="UserProfile"
+        component={UserProfileScreen}
         options={{
           headerShown: false,
           animation: "slide_from_right",

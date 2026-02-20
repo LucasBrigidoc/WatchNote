@@ -7,6 +7,7 @@ import {
   TextInput as RNTextInput,
   ActivityIndicator,
 } from "react-native";
+import { Image } from "expo-image";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { Feather } from "@expo/vector-icons";
@@ -16,15 +17,19 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { ThemedText } from "@/components/ThemedText";
 import { MediaCardFull } from "@/components/MediaCardFull";
+import { Avatar } from "@/components/Avatar";
+import { GlassCard } from "@/components/GlassCard";
 import { EmptyState } from "@/components/EmptyState";
 import { useTheme } from "@/hooks/useTheme";
 import { Spacing, BorderRadius } from "@/constants/theme";
 import { TextInput } from "@/components/TextInput";
 import { DiscoverStackParamList } from "@/navigation/DiscoverStackNavigator";
+import { authFetch } from "@/lib/api";
+import { getApiUrl } from "@/lib/query-client";
 
-type MediaType = "all" | "film" | "series" | "music" | "anime" | "manga" | "book";
+type FilterType = "all" | "film" | "series" | "music" | "anime" | "manga" | "book" | "profiles" | "lists";
 
-const FILTERS: { key: MediaType; label: string }[] = [
+const FILTERS: { key: FilterType; label: string }[] = [
   { key: "all", label: "All" },
   { key: "film", label: "Films" },
   { key: "series", label: "Series" },
@@ -32,6 +37,8 @@ const FILTERS: { key: MediaType; label: string }[] = [
   { key: "anime", label: "Anime" },
   { key: "manga", label: "Manga" },
   { key: "book", label: "Books" },
+  { key: "profiles", label: "Perfis" },
+  { key: "lists", label: "Listas" },
 ];
 
 const TMDB_GENRES: Record<number, string> = {
@@ -52,42 +59,42 @@ export default function SearchScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<DiscoverStackParamList>>();
   const inputRef = useRef<RNTextInput>(null);
   const [query, setQuery] = useState("");
-  const [selectedFilter, setSelectedFilter] = useState<MediaType>("all");
+  const [selectedFilter, setSelectedFilter] = useState<FilterType>("all");
   const [hasSearched, setHasSearched] = useState(false);
   const [results, setResults] = useState<any[]>([]);
+  const [userResults, setUserResults] = useState<any[]>([]);
+  const [listResults, setListResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const searchMovies = async (searchQuery: string) => {
+  const searchAll = async (searchQuery: string) => {
     if (!searchQuery.trim()) {
       setResults([]);
+      setUserResults([]);
+      setListResults([]);
       return;
     }
 
     setLoading(true);
     try {
-      const baseUrl = process.env.EXPO_PUBLIC_DOMAIN 
-        ? `https://${process.env.EXPO_PUBLIC_DOMAIN}` 
-        : "http://127.0.0.1:5000";
-      
-      // Busca Filmes e Séries (TMDB)
-      const movieResponse = await fetch(`${baseUrl}/api/movies/search?q=${encodeURIComponent(searchQuery)}`);
-      const movieData = await movieResponse.json();
-      
-      // Busca Livros (Google Books)
-      const bookResponse = await fetch(`${baseUrl}/api/books/search?q=${encodeURIComponent(searchQuery)}`);
+      const baseUrl = getApiUrl();
+
+      const [movieResponse, bookResponse, musicResponse, animeResponse, mangaResponse, usersResponse, listsResponse] = await Promise.all([
+        fetch(`${baseUrl}/api/movies/search?q=${encodeURIComponent(searchQuery)}`),
+        fetch(`${baseUrl}/api/books/search?q=${encodeURIComponent(searchQuery)}`),
+        fetch(`${baseUrl}/api/music/search?q=${encodeURIComponent(searchQuery)}`),
+        fetch(`${baseUrl}/api/anime/search?q=${encodeURIComponent(searchQuery)}`),
+        fetch(`${baseUrl}/api/manga/search?q=${encodeURIComponent(searchQuery)}`),
+        authFetch(`/api/search/users?q=${encodeURIComponent(searchQuery)}`),
+        authFetch(`/api/search/lists?q=${encodeURIComponent(searchQuery)}`),
+      ]);
+
+      const movieData = await movieResponse.json().catch(() => ({ results: [] }));
       const bookData = await bookResponse.json().catch(() => ({ items: [] }));
-
-      // Busca Músicas (Deezer)
-      const musicResponse = await fetch(`${baseUrl}/api/music/search?q=${encodeURIComponent(searchQuery)}`);
       const musicData = await musicResponse.json().catch(() => ({ data: [] }));
-
-      // Busca Animes (Jikan)
-      const animeResponse = await fetch(`${baseUrl}/api/anime/search?q=${encodeURIComponent(searchQuery)}`);
       const animeData = await animeResponse.json().catch(() => ({ data: [] }));
-
-      // Busca Mangás (Jikan)
-      const mangaResponse = await fetch(`${baseUrl}/api/manga/search?q=${encodeURIComponent(searchQuery)}`);
       const mangaData = await mangaResponse.json().catch(() => ({ data: [] }));
+      const usersData = await usersResponse.json().catch(() => ({ users: [] }));
+      const listsData = await listsResponse.json().catch(() => ({ lists: [] }));
 
       let allResults: any[] = [];
 
@@ -165,6 +172,8 @@ export default function SearchScreen() {
       }
 
       setResults(allResults);
+      setUserResults(usersData.users || []);
+      setListResults(listsData.lists || []);
     } catch (error) {
       console.error("Search error:", error);
     } finally {
@@ -175,9 +184,11 @@ export default function SearchScreen() {
   useEffect(() => {
     const timer = setTimeout(() => {
       if (query.length > 2) {
-        searchMovies(query);
+        searchAll(query);
       } else if (query.length === 0) {
         setResults([]);
+        setUserResults([]);
+        setListResults([]);
       }
     }, 500);
 
@@ -187,7 +198,7 @@ export default function SearchScreen() {
   const handleSearch = () => {
     if (query.trim()) {
       setHasSearched(true);
-      searchMovies(query);
+      searchAll(query);
     }
   };
 
@@ -221,6 +232,51 @@ export default function SearchScreen() {
     />
   );
 
+  const handleUserPress = (userId: string) => {
+    navigation.navigate("UserProfile", { userId });
+  };
+
+  const renderUserItem = ({ item }: { item: any }) => (
+    <Pressable onPress={() => handleUserPress(item.id)}>
+      <GlassCard style={styles.userCard}>
+        <View style={styles.userCardContent}>
+          <Avatar size={48} uri={item.avatarUrl} />
+          <View style={styles.userCardInfo}>
+            <ThemedText type="body" style={{ fontWeight: "600" }}>{item.name}</ThemedText>
+            <ThemedText type="small" style={{ color: theme.textSecondary }}>@{item.username}</ThemedText>
+            {item.bio ? (
+              <ThemedText type="small" style={{ color: theme.textSecondary, marginTop: 4 }} numberOfLines={1}>{item.bio}</ThemedText>
+            ) : null}
+          </View>
+          <Feather name="chevron-right" size={20} color={theme.textSecondary} />
+        </View>
+      </GlassCard>
+    </Pressable>
+  );
+
+  const renderListItem = ({ item }: { item: any }) => (
+    <Pressable onPress={() => handleUserPress(item.userId)}>
+      <GlassCard style={styles.userCard}>
+        <View style={styles.userCardContent}>
+          {item.coverImage ? (
+            <Image source={{ uri: item.coverImage }} style={styles.listThumb} contentFit="cover" />
+          ) : (
+            <View style={[styles.listThumb, { backgroundColor: theme.backgroundSecondary, alignItems: "center", justifyContent: "center" }]}>
+              <Feather name="list" size={20} color={theme.accent} />
+            </View>
+          )}
+          <View style={styles.userCardInfo}>
+            <ThemedText type="body" style={{ fontWeight: "600" }}>{item.name}</ThemedText>
+            <ThemedText type="small" style={{ color: theme.textSecondary }}>por {item.userName} · {item.itemCount} itens</ThemedText>
+          </View>
+          <Feather name="chevron-right" size={20} color={theme.textSecondary} />
+        </View>
+      </GlassCard>
+    </Pressable>
+  );
+
+  const isProfilesOrLists = selectedFilter === "profiles" || selectedFilter === "lists";
+
   const renderEmptyState = () => {
     if (loading) {
       return (
@@ -235,11 +291,13 @@ export default function SearchScreen() {
         <EmptyState
           type="search"
           title="Search for anything"
-          message="Find films, series, music, anime, manga, and books across all platforms."
+          message="Find films, series, music, anime, manga, books, profiles, and lists."
         />
       );
     }
-    if (query && results.length === 0 && !loading) {
+
+    const currentData = selectedFilter === "profiles" ? userResults : selectedFilter === "lists" ? listResults : filteredResults;
+    if (query && currentData.length === 0 && !loading) {
       return (
         <EmptyState
           type="search"
@@ -253,6 +311,7 @@ export default function SearchScreen() {
 
   const filteredResults = results.filter((item) => {
     if (selectedFilter === "all") return true;
+    if (selectedFilter === "profiles" || selectedFilter === "lists") return false;
     if (selectedFilter === "film") return item.type === "film";
     if (selectedFilter === "series") return item.type === "series";
     if (selectedFilter === "music") return item.type === "music";
@@ -326,17 +385,43 @@ export default function SearchScreen() {
         </View>
       </View>
 
-      <FlatList
-        data={filteredResults}
-        renderItem={renderResult}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={[
-          styles.content,
-          filteredResults.length === 0 && styles.emptyContent,
-        ]}
-        scrollIndicatorInsets={{ bottom: insets.bottom }}
-        ListEmptyComponent={renderEmptyState}
-      />
+      {selectedFilter === "profiles" ? (
+        <FlatList
+          data={userResults}
+          renderItem={renderUserItem}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={[
+            styles.content,
+            userResults.length === 0 && styles.emptyContent,
+          ]}
+          scrollIndicatorInsets={{ bottom: insets.bottom }}
+          ListEmptyComponent={renderEmptyState}
+        />
+      ) : selectedFilter === "lists" ? (
+        <FlatList
+          data={listResults}
+          renderItem={renderListItem}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={[
+            styles.content,
+            listResults.length === 0 && styles.emptyContent,
+          ]}
+          scrollIndicatorInsets={{ bottom: insets.bottom }}
+          ListEmptyComponent={renderEmptyState}
+        />
+      ) : (
+        <FlatList
+          data={filteredResults}
+          renderItem={renderResult}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={[
+            styles.content,
+            filteredResults.length === 0 && styles.emptyContent,
+          ]}
+          scrollIndicatorInsets={{ bottom: insets.bottom }}
+          ListEmptyComponent={renderEmptyState}
+        />
+      )}
     </View>
   );
 }
@@ -384,5 +469,21 @@ const styles = StyleSheet.create({
   loadingContainer: {
     padding: Spacing.xl,
     alignItems: "center",
+  },
+  userCard: {
+    marginBottom: Spacing.sm,
+  },
+  userCardContent: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  userCardInfo: {
+    flex: 1,
+    marginLeft: Spacing.md,
+  },
+  listThumb: {
+    width: 48,
+    height: 48,
+    borderRadius: BorderRadius.sm,
   },
 });

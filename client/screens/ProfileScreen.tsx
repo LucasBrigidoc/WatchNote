@@ -106,6 +106,8 @@ export default function ProfileScreen() {
   const [lists, setLists] = useState<UserList[]>([]);
   const [ratings, setRatings] = useState<UserRating[]>([]);
   const [userPosts, setUserPosts] = useState<any[]>([]);
+  const [followerCount, setFollowerCount] = useState(0);
+  const [followingCount, setFollowingCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [showCreateList, setShowCreateList] = useState(false);
 
@@ -116,12 +118,13 @@ export default function ProfileScreen() {
   const fetchProfileData = useCallback(async () => {
     try {
       setLoading(true);
-      const [favRes, statsRes, listsRes, ratingsRes, postsRes] = await Promise.all([
+      const [favRes, statsRes, listsRes, ratingsRes, postsRes, followRes] = await Promise.all([
         authFetch("/api/profile/favorites"),
         authFetch("/api/profile/stats"),
         authFetch("/api/profile/lists"),
         authFetch("/api/profile/ratings"),
         authFetch("/api/posts/user"),
+        authFetch("/api/profile/follow-counts"),
       ]);
 
       if (favRes.ok) {
@@ -143,6 +146,11 @@ export default function ProfileScreen() {
       if (postsRes.ok) {
         const data = await postsRes.json();
         setUserPosts(data.posts || []);
+      }
+      if (followRes.ok) {
+        const data = await followRes.json();
+        setFollowerCount(data.followerCount || 0);
+        setFollowingCount(data.followingCount || 0);
       }
     } catch (error) {
       console.error("Error loading profile data:", error);
@@ -301,6 +309,11 @@ export default function ProfileScreen() {
                   imageUrl: post.mediaImage || "",
                   type: post.mediaType,
                 })}
+                onUserPress={() => {
+                  if (post.userId !== user?.id) {
+                    navigation.navigate("UserProfile", { userId: post.userId });
+                  }
+                }}
               />
             ))}
           </View>
@@ -448,8 +461,8 @@ export default function ProfileScreen() {
 
           <View style={styles.statsHeader}>
             <StatCard value={totalRatings} label="Reviews" />
-            <StatCard value={totalRatings} label="Ratings" />
-            <StatCard value={0} label="Followers" />
+            <StatCard value={followerCount} label="Seguidores" />
+            <StatCard value={followingCount} label="Seguindo" />
           </View>
         </View>
 

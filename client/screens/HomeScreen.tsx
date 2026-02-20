@@ -150,6 +150,11 @@ export default function HomeScreen() {
         imageUrl: item.media.imageUrl,
         type: item.media.type,
       })}
+      onUserPress={() => {
+        if ((item as any).userId) {
+          navigation.navigate("UserProfile", { userId: (item as any).userId });
+        }
+      }}
     />
   );
 

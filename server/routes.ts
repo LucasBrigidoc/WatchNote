@@ -398,6 +398,89 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ---- Search Users & Lists ----
+  app.get("/api/search/users", async (req: Request, res: Response) => {
+    try {
+      const q = (req.query.q as string) || "";
+      if (q.length < 2) return res.json({ users: [] });
+      const results = await storage.searchUsers(q);
+      res.json({ users: results });
+    } catch (error) {
+      console.error("Search users error:", error);
+      res.status(500).json({ message: "Erro ao buscar usuários" });
+    }
+  });
+
+  app.get("/api/search/lists", async (req: Request, res: Response) => {
+    try {
+      const q = (req.query.q as string) || "";
+      if (q.length < 2) return res.json({ lists: [] });
+      const results = await storage.searchLists(q);
+      res.json({ lists: results });
+    } catch (error) {
+      console.error("Search lists error:", error);
+      res.status(500).json({ message: "Erro ao buscar listas" });
+    }
+  });
+
+  // ---- Follow/Unfollow ----
+  app.post("/api/users/:userId/follow", async (req: Request, res: Response) => {
+    try {
+      const followerId = getUserIdFromToken(req);
+      if (!followerId) return res.status(401).json({ message: "Não autenticado" });
+      const followingId = req.params.userId;
+      if (followerId === followingId) return res.status(400).json({ message: "Você não pode seguir a si mesmo" });
+      await storage.followUser(followerId, followingId);
+      res.json({ message: "Seguindo" });
+    } catch (error) {
+      console.error("Follow error:", error);
+      res.status(500).json({ message: "Erro ao seguir" });
+    }
+  });
+
+  app.delete("/api/users/:userId/follow", async (req: Request, res: Response) => {
+    try {
+      const followerId = getUserIdFromToken(req);
+      if (!followerId) return res.status(401).json({ message: "Não autenticado" });
+      await storage.unfollowUser(followerId, req.params.userId);
+      res.json({ message: "Deixou de seguir" });
+    } catch (error) {
+      console.error("Unfollow error:", error);
+      res.status(500).json({ message: "Erro ao deixar de seguir" });
+    }
+  });
+
+  // ---- Public Profile ----
+  app.get("/api/users/:userId/profile", async (req: Request, res: Response) => {
+    try {
+      const viewerId = getUserIdFromToken(req);
+      const targetId = req.params.userId;
+      const profile = await storage.getPublicProfile(targetId);
+      const followerCount = await storage.getFollowerCount(targetId);
+      const followingCount = await storage.getFollowingCount(targetId);
+      const isFollowing = viewerId ? await storage.isFollowing(viewerId, targetId) : false;
+      res.json({ ...profile, followerCount, followingCount, isFollowing });
+    } catch (error: any) {
+      if (error.message === "User not found") return res.status(404).json({ message: "Usuário não encontrado" });
+      console.error("Public profile error:", error);
+      res.status(500).json({ message: "Erro ao buscar perfil" });
+    }
+  });
+
+  // ---- Own follow counts ----
+  app.get("/api/profile/follow-counts", async (req: Request, res: Response) => {
+    try {
+      const userId = getUserIdFromToken(req);
+      if (!userId) return res.status(401).json({ message: "Não autenticado" });
+      const followerCount = await storage.getFollowerCount(userId);
+      const followingCount = await storage.getFollowingCount(userId);
+      res.json({ followerCount, followingCount });
+    } catch (error) {
+      console.error("Follow counts error:", error);
+      res.status(500).json({ message: "Erro ao buscar contagem" });
+    }
+  });
+
   app.get("/api/movies/trending", async (req, res) => {
     try {
       const apiKey = process.env.TMDB_API_KEY;

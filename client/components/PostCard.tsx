@@ -34,6 +34,7 @@ interface PostCardProps {
   commentCount: number;
   onPress?: () => void;
   onMediaPress?: () => void;
+  onUserPress?: () => void;
   onLike?: () => void;
   onComment?: () => void;
 }
@@ -51,6 +52,7 @@ export function PostCard({
   commentCount,
   onPress,
   onMediaPress,
+  onUserPress,
   onLike,
   onComment,
 }: PostCardProps) {
@@ -77,7 +79,7 @@ export function PostCard({
       style={animatedStyle}
     >
       <GlassCard style={styles.card}>
-        <View style={styles.header}>
+        <Pressable style={styles.header} onPress={onUserPress} disabled={!onUserPress}>
           <Avatar uri={user.avatarUrl} size={40} />
           <View style={styles.userInfo}>
             <ThemedText type="body" style={styles.userName}>
@@ -90,7 +92,7 @@ export function PostCard({
               {timestamp}
             </ThemedText>
           </View>
-        </View>
+        </Pressable>
 
         <View style={styles.mediaRow}>
           <Pressable onPress={onMediaPress} disabled={!onMediaPress}>

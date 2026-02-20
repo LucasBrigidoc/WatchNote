@@ -66,3 +66,14 @@
 - Adicionado mapeamento de gêneros TMDB (IDs para nomes em português)
 - Prevenção de posts duplicados: usuário não pode avaliar a mesma mídia duas vezes (constraint único no banco + verificação no backend)
 - Posts agora auto-atualizam avaliações (upsert em userRatings), garantindo que estatísticas do perfil refletem posts imediatamente
+- Sistema de seguidores: tabela `follows` com follow/unfollow, contagem de seguidores/seguindo
+- Busca por perfis e listas na SearchScreen com filtros "Perfis" e "Listas"
+- UserProfileScreen: tela pública de perfil com bio, favoritos, avaliações, posts e botão seguir/deixar de seguir
+- Clicar no nome do usuário em um PostCard navega para o perfil público do usuário
+- Rotas: GET /api/search/users, GET /api/search/lists, POST/DELETE /api/users/:id/follow, GET /api/users/:id/profile, GET /api/profile/follow-counts
+
+## Sistema Social
+- **Follows**: Tabela `follows` (followerId, followingId) com constraint único
+- **Busca**: Pesquisa de usuários por nome/username e listas por nome
+- **Perfil Público**: Visualização de perfil de outros usuários com posts, favoritos, estatísticas e botão seguir
+- **Navegação**: PostCard.onUserPress → UserProfileScreen; SearchScreen filtros Perfis/Listas → UserProfileScreen

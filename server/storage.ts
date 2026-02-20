@@ -5,9 +5,10 @@ import {
   type UserList, userLists,
   type UserListItem, userListItems,
   type Post, posts,
+  type Follow, follows,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, sql, desc } from "drizzle-orm";
+import { eq, and, sql, desc, ilike, or, ne, count } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
@@ -38,6 +39,15 @@ export interface IStorage {
   createPost(userId: string, data: { mediaId: string; mediaType: string; mediaTitle: string; mediaImage?: string; rating: number; comment: string; isFavorite?: boolean; firstTime?: boolean; hasSpoilers?: boolean }): Promise<Post>;
   getUserPosts(userId: string): Promise<(Post & { userName: string; userAvatar: string | null })[]>;
   getAllPosts(): Promise<(Post & { userName: string; userAvatar: string | null })[]>;
+
+  searchUsers(query: string): Promise<{ id: string; name: string; username: string; avatarUrl: string | null; bio: string | null }[]>;
+  searchLists(query: string): Promise<{ id: string; name: string; coverImage: string | null; itemCount: number; userName: string; userId: string }[]>;
+  followUser(followerId: string, followingId: string): Promise<void>;
+  unfollowUser(followerId: string, followingId: string): Promise<void>;
+  isFollowing(followerId: string, followingId: string): Promise<boolean>;
+  getFollowerCount(userId: string): Promise<number>;
+  getFollowingCount(userId: string): Promise<number>;
+  getPublicProfile(userId: string): Promise<{ user: any; favorites: UserFavorite[]; stats: any; posts: any[]; listCount: number }>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -295,6 +305,68 @@ export class DatabaseStorage implements IStorage {
       .innerJoin(users, eq(posts.userId, users.id))
       .orderBy(desc(posts.createdAt));
     return result;
+  }
+
+  async searchUsers(query: string): Promise<{ id: string; name: string; username: string; avatarUrl: string | null; bio: string | null }[]> {
+    const result = await db
+      .select({ id: users.id, name: users.name, username: users.username, avatarUrl: users.avatarUrl, bio: users.bio })
+      .from(users)
+      .where(or(ilike(users.name, `%${query}%`), ilike(users.username, `%${query}%`)))
+      .limit(20);
+    return result;
+  }
+
+  async searchLists(query: string): Promise<{ id: string; name: string; coverImage: string | null; itemCount: number; userName: string; userId: string }[]> {
+    const listsResult = await db
+      .select({ id: userLists.id, name: userLists.name, coverImage: userLists.coverImage, userId: userLists.userId, userName: users.name })
+      .from(userLists)
+      .innerJoin(users, eq(userLists.userId, users.id))
+      .where(ilike(userLists.name, `%${query}%`))
+      .limit(20);
+
+    const result: { id: string; name: string; coverImage: string | null; itemCount: number; userName: string; userId: string }[] = [];
+    for (const list of listsResult) {
+      const items = await db.select({ count: sql<number>`count(*)` }).from(userListItems).where(eq(userListItems.listId, list.id));
+      result.push({ ...list, itemCount: Number(items[0]?.count || 0) });
+    }
+    return result;
+  }
+
+  async followUser(followerId: string, followingId: string): Promise<void> {
+    await db.insert(follows).values({ followerId, followingId }).onConflictDoNothing();
+  }
+
+  async unfollowUser(followerId: string, followingId: string): Promise<void> {
+    await db.delete(follows).where(and(eq(follows.followerId, followerId), eq(follows.followingId, followingId)));
+  }
+
+  async isFollowing(followerId: string, followingId: string): Promise<boolean> {
+    const result = await db.select().from(follows).where(and(eq(follows.followerId, followerId), eq(follows.followingId, followingId)));
+    return result.length > 0;
+  }
+
+  async getFollowerCount(userId: string): Promise<number> {
+    const result = await db.select({ count: sql<number>`count(*)` }).from(follows).where(eq(follows.followingId, userId));
+    return Number(result[0]?.count || 0);
+  }
+
+  async getFollowingCount(userId: string): Promise<number> {
+    const result = await db.select({ count: sql<number>`count(*)` }).from(follows).where(eq(follows.followerId, userId));
+    return Number(result[0]?.count || 0);
+  }
+
+  async getPublicProfile(userId: string): Promise<{ user: any; favorites: UserFavorite[]; stats: any; posts: any[]; listCount: number }> {
+    const user = await this.getUser(userId);
+    if (!user) throw new Error("User not found");
+
+    const { password, ...safeUser } = user;
+    const favorites = await this.getFavorites(userId);
+    const stats = await this.getRatingStats(userId);
+    const userPosts = await this.getUserPosts(userId);
+    const lists = await db.select({ count: sql<number>`count(*)` }).from(userLists).where(eq(userLists.userId, userId));
+    const listCount = Number(lists[0]?.count || 0);
+
+    return { user: safeUser, favorites, stats, posts: userPosts, listCount };
   }
 }
 
