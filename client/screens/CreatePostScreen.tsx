@@ -20,6 +20,7 @@ import { MediaTypeBadge, MediaType } from "@/components/MediaTypeBadge";
 import { useTheme } from "@/hooks/useTheme";
 import { Spacing, BorderRadius } from "@/constants/theme";
 import { TextInput } from "@/components/TextInput";
+import { authFetch } from "@/lib/api";
 
 type MediaTypeOption = "film" | "series" | "music" | "anime" | "manga" | "book";
 
@@ -66,6 +67,7 @@ export default function CreatePostScreen() {
   const [isFavorite, setIsFavorite] = useState(false);
   const [firstTime, setFirstTime] = useState(true);
   const [hasSpoilers, setHasSpoilers] = useState(false);
+  const [publishing, setPublishing] = useState(false);
 
   const searchMovies = async (query: string) => {
     if (!query.trim()) {
@@ -168,12 +170,39 @@ export default function CreatePostScreen() {
 
   const filteredResults = results.filter((m) => !selectedType || m.type === selectedType);
 
-  const handlePublish = () => {
-    if (!canPublish) return;
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    Alert.alert("Post Published!", "Your review has been shared.", [
-      { text: "OK", onPress: () => navigation.goBack() },
-    ]);
+  const handlePublish = async () => {
+    if (!canPublish || publishing) return;
+    setPublishing(true);
+    try {
+      const res = await authFetch("/api/posts", {
+        method: "POST",
+        body: JSON.stringify({
+          mediaId: selectedMedia.id,
+          mediaType: selectedMedia.type,
+          mediaTitle: selectedMedia.title,
+          mediaImage: selectedMedia.imageUrl,
+          rating,
+          comment: comment.trim(),
+          isFavorite,
+          firstTime,
+          hasSpoilers,
+        }),
+      });
+      if (res.ok) {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        Alert.alert("Publicado!", "Seu post foi compartilhado.", [
+          { text: "OK", onPress: () => navigation.goBack() },
+        ]);
+      } else {
+        const data = await res.json();
+        Alert.alert("Erro", data.message || "Não foi possível publicar.");
+      }
+    } catch (error) {
+      console.error("Publish error:", error);
+      Alert.alert("Erro", "Falha ao publicar o post.");
+    } finally {
+      setPublishing(false);
+    }
   };
 
   const canPublish = selectedMedia && rating > 0 && comment.trim().length > 0;
@@ -471,24 +500,28 @@ export default function CreatePostScreen() {
 
             <Pressable
               onPress={handlePublish}
-              disabled={!canPublish}
+              disabled={!canPublish || publishing}
               style={[
                 styles.publishButton,
                 {
                   backgroundColor: canPublish ? theme.accent : theme.border,
-                  opacity: canPublish ? 1 : 0.6,
+                  opacity: canPublish && !publishing ? 1 : 0.6,
                 },
               ]}
             >
-              <ThemedText
-                style={{
-                  color: "#FFFFFF",
-                  fontWeight: "700",
-                  fontSize: 16,
-                }}
-              >
-                Publicar
-              </ThemedText>
+              {publishing ? (
+                <ActivityIndicator color="#FFFFFF" size="small" />
+              ) : (
+                <ThemedText
+                  style={{
+                    color: "#FFFFFF",
+                    fontWeight: "700",
+                    fontSize: 16,
+                  }}
+                >
+                  Publicar
+                </ThemedText>
+              )}
             </Pressable>
           </>
         )}

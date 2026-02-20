@@ -3,7 +3,7 @@ import { createServer, type Server } from "node:http";
 import bcrypt from "bcryptjs";
 import { randomBytes } from "crypto";
 import { storage } from "./storage";
-import { insertFavoriteSchema, insertRatingSchema, insertListSchema, insertListItemSchema } from "@shared/schema";
+import { insertFavoriteSchema, insertRatingSchema, insertListSchema, insertListItemSchema, insertPostSchema } from "@shared/schema";
 
 const tokens = new Map<string, string>();
 
@@ -305,6 +305,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Remove list item error:", error);
       res.status(500).json({ message: "Erro ao remover item" });
+    }
+  });
+
+  // ---- Posts ----
+  app.post("/api/posts", async (req: Request, res: Response) => {
+    try {
+      const userId = getUserIdFromToken(req);
+      if (!userId) return res.status(401).json({ message: "Não autenticado" });
+      const parsed = insertPostSchema.safeParse(req.body);
+      if (!parsed.success) return res.status(400).json({ message: "Dados inválidos", errors: parsed.error.errors });
+      const post = await storage.createPost(userId, parsed.data);
+      res.status(201).json({ post });
+    } catch (error) {
+      console.error("Create post error:", error);
+      res.status(500).json({ message: "Erro ao criar post" });
+    }
+  });
+
+  app.get("/api/posts", async (req: Request, res: Response) => {
+    try {
+      const allPosts = await storage.getAllPosts();
+      res.json({ posts: allPosts });
+    } catch (error) {
+      console.error("Get posts error:", error);
+      res.status(500).json({ message: "Erro ao buscar posts" });
+    }
+  });
+
+  app.get("/api/posts/user", async (req: Request, res: Response) => {
+    try {
+      const userId = getUserIdFromToken(req);
+      if (!userId) return res.status(401).json({ message: "Não autenticado" });
+      const userPosts = await storage.getUserPosts(userId);
+      res.json({ posts: userPosts });
+    } catch (error) {
+      console.error("Get user posts error:", error);
+      res.status(500).json({ message: "Erro ao buscar posts do usuário" });
     }
   });
 

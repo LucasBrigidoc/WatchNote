@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp, integer, uniqueIndex } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, integer, uniqueIndex, boolean as pgBoolean } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -67,6 +67,25 @@ export const userListItems = pgTable("user_list_items", {
   addedAt: timestamp("added_at").defaultNow(),
 });
 
+export const posts = pgTable("posts", {
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  mediaId: text("media_id").notNull(),
+  mediaType: text("media_type").notNull(),
+  mediaTitle: text("media_title").notNull(),
+  mediaImage: text("media_image"),
+  rating: integer("rating").notNull(),
+  comment: text("comment").notNull(),
+  isFavorite: pgBoolean("is_favorite").default(false),
+  firstTime: pgBoolean("first_time").default(true),
+  hasSpoilers: pgBoolean("has_spoilers").default(false),
+  likeCount: integer("like_count").default(0),
+  commentCount: integer("comment_count").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   email: true,
@@ -102,9 +121,22 @@ export const insertListItemSchema = z.object({
   mediaImage: z.string().optional(),
 });
 
+export const insertPostSchema = z.object({
+  mediaId: z.string().min(1),
+  mediaType: z.string().min(1),
+  mediaTitle: z.string().min(1),
+  mediaImage: z.string().optional(),
+  rating: z.number().min(1).max(5),
+  comment: z.string().min(1),
+  isFavorite: z.boolean().optional(),
+  firstTime: z.boolean().optional(),
+  hasSpoilers: z.boolean().optional(),
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type UserFavorite = typeof userFavorites.$inferSelect;
 export type UserRating = typeof userRatings.$inferSelect;
 export type UserList = typeof userLists.$inferSelect;
 export type UserListItem = typeof userListItems.$inferSelect;
+export type Post = typeof posts.$inferSelect;

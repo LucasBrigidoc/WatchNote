@@ -43,7 +43,13 @@
 - **Componentes**: CreateListModal (criar lista com nome e capa), SaveToListModal (salvar mídia em lista existente)
 - **Fluxo**: Perfil > Listas > Criar Nova Lista (modal com nome + imagem de capa); MediaDetail > Salvar na Lista > escolher lista ou criar nova
 
-## Mudanças Recentes (2026-02-07)
+## Posts
+- **Schema**: Tabela `posts` com id, userId, mediaId, mediaType, mediaTitle, mediaImage, rating, comment, isFavorite, firstTime, hasSpoilers, likeCount, commentCount, createdAt
+- **Rotas**: POST /api/posts (criar), GET /api/posts (todos), GET /api/posts/user (do usuário autenticado)
+- **CreatePostScreen**: Busca real de mídias, publica post via API, salva no banco de dados
+- **ProfileScreen**: Aba "Posts" exibe posts reais do usuário com PostCard
+
+## Mudanças Recentes (2026-02-20)
 - Implementada funcionalidade completa de listas: criar listas com nome e capa, salvar mídias em listas
 - Criado CreateListModal com seletor de imagem de capa (expo-image-picker)
 - Criado SaveToListModal para salvar mídias em listas existentes ou criar nova lista

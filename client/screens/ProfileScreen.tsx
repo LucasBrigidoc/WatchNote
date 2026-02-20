@@ -72,6 +72,21 @@ interface UserRating {
   createdAt: string;
 }
 
+function formatTimeAgo(dateStr: string): string {
+  const now = new Date();
+  const date = new Date(dateStr);
+  const diffMs = now.getTime() - date.getTime();
+  const diffMin = Math.floor(diffMs / 60000);
+  if (diffMin < 1) return "agora";
+  if (diffMin < 60) return `${diffMin}m`;
+  const diffHours = Math.floor(diffMin / 60);
+  if (diffHours < 24) return `${diffHours}h`;
+  const diffDays = Math.floor(diffHours / 24);
+  if (diffDays < 30) return `${diffDays}d`;
+  const diffMonths = Math.floor(diffDays / 30);
+  return `${diffMonths}mo`;
+}
+
 export default function ProfileScreen() {
   const { user } = useAuth();
   const insets = useSafeAreaInsets();
@@ -87,6 +102,7 @@ export default function ProfileScreen() {
   });
   const [lists, setLists] = useState<UserList[]>([]);
   const [ratings, setRatings] = useState<UserRating[]>([]);
+  const [userPosts, setUserPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateList, setShowCreateList] = useState(false);
 
@@ -97,11 +113,12 @@ export default function ProfileScreen() {
   const fetchProfileData = useCallback(async () => {
     try {
       setLoading(true);
-      const [favRes, statsRes, listsRes, ratingsRes] = await Promise.all([
+      const [favRes, statsRes, listsRes, ratingsRes, postsRes] = await Promise.all([
         authFetch("/api/profile/favorites"),
         authFetch("/api/profile/stats"),
         authFetch("/api/profile/lists"),
         authFetch("/api/profile/ratings"),
+        authFetch("/api/posts/user"),
       ]);
 
       if (favRes.ok) {
@@ -119,6 +136,10 @@ export default function ProfileScreen() {
       if (ratingsRes.ok) {
         const data = await ratingsRes.json();
         setRatings(data.ratings || []);
+      }
+      if (postsRes.ok) {
+        const data = await postsRes.json();
+        setUserPosts(data.posts || []);
       }
     } catch (error) {
       console.error("Error loading profile data:", error);
@@ -245,12 +266,35 @@ export default function ProfileScreen() {
 
     switch (activeTab) {
       case "posts":
+        if (userPosts.length === 0) {
+          return (
+            <EmptyState
+              type="posts"
+              title="Nenhum post ainda"
+              message="Compartilhe suas opiniões sobre o que você está consumindo."
+            />
+          );
+        }
         return (
-          <EmptyState
-            type="posts"
-            title="Nenhum post ainda"
-            message="Compartilhe suas opiniões sobre o que você está consumindo."
-          />
+          <View style={styles.tabContent}>
+            {userPosts.map((post: any) => (
+              <PostCard
+                key={post.id}
+                id={post.id}
+                user={{ name: post.userName, avatarUrl: post.userAvatar || undefined }}
+                media={{
+                  title: post.mediaTitle,
+                  imageUrl: post.mediaImage || "https://via.placeholder.com/150x220?text=No+Image",
+                  type: post.mediaType as any,
+                }}
+                rating={post.rating}
+                comment={post.comment}
+                timestamp={formatTimeAgo(post.createdAt)}
+                likeCount={post.likeCount || 0}
+                commentCount={post.commentCount || 0}
+              />
+            ))}
+          </View>
         );
 
       case "reviews":

@@ -4,9 +4,10 @@ import {
   type UserRating, userRatings,
   type UserList, userLists,
   type UserListItem, userListItems,
+  type Post, posts,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, sql } from "drizzle-orm";
+import { eq, and, sql, desc } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
@@ -30,6 +31,10 @@ export interface IStorage {
   getListItems(listId: string): Promise<UserListItem[]>;
   addListItem(listId: string, data: { mediaId: string; mediaType: string; mediaTitle: string; mediaImage?: string }): Promise<UserListItem>;
   removeListItem(itemId: string): Promise<void>;
+
+  createPost(userId: string, data: { mediaId: string; mediaType: string; mediaTitle: string; mediaImage?: string; rating: number; comment: string; isFavorite?: boolean; firstTime?: boolean; hasSpoilers?: boolean }): Promise<Post>;
+  getUserPosts(userId: string): Promise<(Post & { userName: string; userAvatar: string | null })[]>;
+  getAllPosts(): Promise<(Post & { userName: string; userAvatar: string | null })[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -193,6 +198,75 @@ export class DatabaseStorage implements IStorage {
 
   async removeListItem(itemId: string): Promise<void> {
     await db.delete(userListItems).where(eq(userListItems.id, itemId));
+  }
+
+  async createPost(userId: string, data: { mediaId: string; mediaType: string; mediaTitle: string; mediaImage?: string; rating: number; comment: string; isFavorite?: boolean; firstTime?: boolean; hasSpoilers?: boolean }): Promise<Post> {
+    const result = await db.insert(posts).values({
+      userId,
+      mediaId: data.mediaId,
+      mediaType: data.mediaType,
+      mediaTitle: data.mediaTitle,
+      mediaImage: data.mediaImage || null,
+      rating: data.rating,
+      comment: data.comment,
+      isFavorite: data.isFavorite || false,
+      firstTime: data.firstTime ?? true,
+      hasSpoilers: data.hasSpoilers || false,
+    }).returning();
+    return result[0];
+  }
+
+  async getUserPosts(userId: string): Promise<(Post & { userName: string; userAvatar: string | null })[]> {
+    const result = await db
+      .select({
+        id: posts.id,
+        userId: posts.userId,
+        mediaId: posts.mediaId,
+        mediaType: posts.mediaType,
+        mediaTitle: posts.mediaTitle,
+        mediaImage: posts.mediaImage,
+        rating: posts.rating,
+        comment: posts.comment,
+        isFavorite: posts.isFavorite,
+        firstTime: posts.firstTime,
+        hasSpoilers: posts.hasSpoilers,
+        likeCount: posts.likeCount,
+        commentCount: posts.commentCount,
+        createdAt: posts.createdAt,
+        userName: users.name,
+        userAvatar: users.avatarUrl,
+      })
+      .from(posts)
+      .innerJoin(users, eq(posts.userId, users.id))
+      .where(eq(posts.userId, userId))
+      .orderBy(desc(posts.createdAt));
+    return result;
+  }
+
+  async getAllPosts(): Promise<(Post & { userName: string; userAvatar: string | null })[]> {
+    const result = await db
+      .select({
+        id: posts.id,
+        userId: posts.userId,
+        mediaId: posts.mediaId,
+        mediaType: posts.mediaType,
+        mediaTitle: posts.mediaTitle,
+        mediaImage: posts.mediaImage,
+        rating: posts.rating,
+        comment: posts.comment,
+        isFavorite: posts.isFavorite,
+        firstTime: posts.firstTime,
+        hasSpoilers: posts.hasSpoilers,
+        likeCount: posts.likeCount,
+        commentCount: posts.commentCount,
+        createdAt: posts.createdAt,
+        userName: users.name,
+        userAvatar: users.avatarUrl,
+      })
+      .from(posts)
+      .innerJoin(users, eq(posts.userId, users.id))
+      .orderBy(desc(posts.createdAt));
+    return result;
   }
 }
 
