@@ -40,8 +40,9 @@
 
 ## Listas de Mídia
 - **Schema**: Tabela `user_lists` com id, userId, name, coverImage, createdAt; `user_list_items` com id, listId, mediaId, mediaType, mediaTitle, mediaImage, addedAt
-- **Componentes**: CreateListModal (criar lista com nome e capa), SaveToListModal (salvar mídia em lista existente)
-- **Fluxo**: Perfil > Listas > Criar Nova Lista (modal com nome + imagem de capa); MediaDetail > Salvar na Lista > escolher lista ou criar nova
+- **Componentes**: CreateListModal (criar lista com nome e capa), SaveToListModal (salvar mídia em lista existente), ListDetailScreen (ver itens, nota, remover mídias)
+- **Fluxo**: Perfil > Listas > Criar Nova Lista (modal com nome + imagem de capa); MediaDetail > Salvar na Lista > escolher lista ou criar nova; Perfil > Listas > Tocar na lista > ListDetailScreen com nota editável e remoção de itens
+- **Schema**: Tabela `user_lists` agora inclui campo `description` para notas
 
 ## Posts
 - **Schema**: Tabela `posts` com id, userId, mediaId, mediaType, mediaTitle, mediaImage, rating, comment, isFavorite, firstTime, hasSpoilers, likeCount, commentCount, createdAt

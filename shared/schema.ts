@@ -51,6 +51,7 @@ export const userLists = pgTable("user_lists", {
     .default(sql`gen_random_uuid()`),
   userId: varchar("user_id").notNull().references(() => users.id),
   name: text("name").notNull(),
+  description: text("description").default(""),
   coverImage: text("cover_image"),
   createdAt: timestamp("created_at").defaultNow(),
 });

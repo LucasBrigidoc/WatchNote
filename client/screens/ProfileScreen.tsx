@@ -11,7 +11,9 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { Feather } from "@expo/vector-icons";
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import type { ProfileStackParamList } from "@/navigation/ProfileStackNavigator";
 
 import { ThemedText } from "@/components/ThemedText";
 import { Avatar } from "@/components/Avatar";
@@ -93,6 +95,7 @@ export default function ProfileScreen() {
   const headerHeight = useHeaderHeight();
   const tabBarHeight = useBottomTabBarHeight();
   const { theme } = useTheme();
+  const navigation = useNavigation<NativeStackNavigationProp<ProfileStackParamList>>();
   const [activeTab, setActiveTab] = useState<ProfileTab>("reviews");
 
   const [favorites, setFavorites] = useState<Favorite[]>([]);
@@ -345,42 +348,44 @@ export default function ProfileScreen() {
             </Pressable>
             {lists.length > 0 ? (
               lists.map((list: any) => (
-                <GlassCard key={list.id} style={styles.listCard}>
-                  <View style={styles.listContent}>
-                    {list.coverImage ? (
-                      <Image
-                        source={{ uri: list.coverImage }}
-                        style={styles.listThumbnail}
-                        contentFit="cover"
-                      />
-                    ) : (
-                      <View
-                        style={[
-                          styles.listThumbnail,
-                          { backgroundColor: theme.backgroundSecondary, alignItems: "center", justifyContent: "center" },
-                        ]}
-                      >
-                        <Feather name="list" size={24} color={theme.accent} />
+                <Pressable key={list.id} onPress={() => navigation.navigate("ListDetail", { listId: list.id })}>
+                  <GlassCard style={styles.listCard}>
+                    <View style={styles.listContent}>
+                      {list.coverImage ? (
+                        <Image
+                          source={{ uri: list.coverImage }}
+                          style={styles.listThumbnail}
+                          contentFit="cover"
+                        />
+                      ) : (
+                        <View
+                          style={[
+                            styles.listThumbnail,
+                            { backgroundColor: theme.backgroundSecondary, alignItems: "center", justifyContent: "center" },
+                          ]}
+                        >
+                          <Feather name="list" size={24} color={theme.accent} />
+                        </View>
+                      )}
+                      <View style={styles.listInfo}>
+                        <ThemedText type="body" style={{ fontWeight: "600" }}>
+                          {list.name}
+                        </ThemedText>
+                        <ThemedText
+                          type="small"
+                          style={{ color: theme.textSecondary }}
+                        >
+                          {list.itemCount} itens
+                        </ThemedText>
                       </View>
-                    )}
-                    <View style={styles.listInfo}>
-                      <ThemedText type="body" style={{ fontWeight: "600" }}>
-                        {list.name}
-                      </ThemedText>
-                      <ThemedText
-                        type="small"
-                        style={{ color: theme.textSecondary }}
-                      >
-                        {list.itemCount} itens
-                      </ThemedText>
+                      <Feather
+                        name="chevron-right"
+                        size={20}
+                        color={theme.textSecondary}
+                      />
                     </View>
-                    <Feather
-                      name="chevron-right"
-                      size={20}
-                      color={theme.textSecondary}
-                    />
-                  </View>
-                </GlassCard>
+                  </GlassCard>
+                </Pressable>
               ))
             ) : (
               <EmptyState

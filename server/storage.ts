@@ -26,7 +26,9 @@ export interface IStorage {
   getRatingStats(userId: string): Promise<{ distribution: { stars: number; count: number }[]; categoryStats: { category: string; count: number }[] }>;
 
   getLists(userId: string): Promise<(UserList & { itemCount: number })[]>;
-  createList(userId: string, name: string, coverImage?: string): Promise<UserList>;
+  getListById(listId: string): Promise<UserList | null>;
+  createList(userId: string, name: string, coverImage?: string, description?: string): Promise<UserList>;
+  updateList(userId: string, listId: string, data: { name?: string; description?: string; coverImage?: string }): Promise<UserList | null>;
   deleteList(userId: string, listId: string): Promise<void>;
   getListItems(listId: string): Promise<UserListItem[]>;
   addListItem(listId: string, data: { mediaId: string; mediaType: string; mediaTitle: string; mediaImage?: string }): Promise<UserListItem>;
@@ -168,9 +170,27 @@ export class DatabaseStorage implements IStorage {
     return result;
   }
 
-  async createList(userId: string, name: string, coverImage?: string): Promise<UserList> {
-    const result = await db.insert(userLists).values({ userId, name, coverImage: coverImage || null }).returning();
+  async getListById(listId: string): Promise<UserList | null> {
+    const result = await db.select().from(userLists).where(eq(userLists.id, listId));
+    return result[0] || null;
+  }
+
+  async createList(userId: string, name: string, coverImage?: string, description?: string): Promise<UserList> {
+    const result = await db.insert(userLists).values({ userId, name, coverImage: coverImage || null, description: description || "" }).returning();
     return result[0];
+  }
+
+  async updateList(userId: string, listId: string, data: { name?: string; description?: string; coverImage?: string }): Promise<UserList | null> {
+    const updates: Record<string, any> = {};
+    if (data.name !== undefined) updates.name = data.name;
+    if (data.description !== undefined) updates.description = data.description;
+    if (data.coverImage !== undefined) updates.coverImage = data.coverImage;
+    if (Object.keys(updates).length === 0) return this.getListById(listId);
+    const result = await db.update(userLists)
+      .set(updates)
+      .where(and(eq(userLists.id, listId), eq(userLists.userId, userId)))
+      .returning();
+    return result[0] || null;
   }
 
   async deleteList(userId: string, listId: string): Promise<void> {

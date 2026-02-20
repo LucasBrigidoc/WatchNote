@@ -258,6 +258,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/profile/lists/:listId", async (req: Request, res: Response) => {
+    try {
+      const userId = getUserIdFromToken(req);
+      if (!userId) return res.status(401).json({ message: "Não autenticado" });
+      const list = await storage.getListById(req.params.listId as string);
+      if (!list || list.userId !== userId) return res.status(404).json({ message: "Lista não encontrada" });
+      const items = await storage.getListItems(list.id);
+      res.json({ list, items });
+    } catch (error) {
+      console.error("Get list detail error:", error);
+      res.status(500).json({ message: "Erro ao buscar lista" });
+    }
+  });
+
+  app.patch("/api/profile/lists/:listId", async (req: Request, res: Response) => {
+    try {
+      const userId = getUserIdFromToken(req);
+      if (!userId) return res.status(401).json({ message: "Não autenticado" });
+      const { name, description, coverImage } = req.body;
+      const list = await storage.updateList(userId, req.params.listId as string, { name, description, coverImage });
+      if (!list) return res.status(404).json({ message: "Lista não encontrada" });
+      res.json({ list });
+    } catch (error) {
+      console.error("Update list error:", error);
+      res.status(500).json({ message: "Erro ao atualizar lista" });
+    }
+  });
+
   app.delete("/api/profile/lists/:listId", async (req: Request, res: Response) => {
     try {
       const userId = getUserIdFromToken(req);
@@ -274,7 +302,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = getUserIdFromToken(req);
       if (!userId) return res.status(401).json({ message: "Não autenticado" });
-      const items = await storage.getListItems(req.params.listId as string);
+      const list = await storage.getListById(req.params.listId as string);
+      if (!list || list.userId !== userId) return res.status(404).json({ message: "Lista não encontrada" });
+      const items = await storage.getListItems(list.id);
       res.json({ items });
     } catch (error) {
       console.error("Get list items error:", error);
@@ -286,9 +316,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = getUserIdFromToken(req);
       if (!userId) return res.status(401).json({ message: "Não autenticado" });
+      const list = await storage.getListById(req.params.listId as string);
+      if (!list || list.userId !== userId) return res.status(404).json({ message: "Lista não encontrada" });
       const parsed = insertListItemSchema.safeParse(req.body);
       if (!parsed.success) return res.status(400).json({ message: "Dados inválidos" });
-      const item = await storage.addListItem(req.params.listId as string, parsed.data);
+      const item = await storage.addListItem(list.id, parsed.data);
       res.status(201).json({ item });
     } catch (error) {
       console.error("Add list item error:", error);
@@ -300,6 +332,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = getUserIdFromToken(req);
       if (!userId) return res.status(401).json({ message: "Não autenticado" });
+      const list = await storage.getListById(req.params.listId as string);
+      if (!list || list.userId !== userId) return res.status(404).json({ message: "Lista não encontrada" });
       await storage.removeListItem(req.params.itemId as string);
       res.json({ message: "Item removido" });
     } catch (error) {

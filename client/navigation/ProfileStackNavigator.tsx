@@ -7,12 +7,14 @@ import { Feather } from "@expo/vector-icons";
 
 import ProfileScreen from "@/screens/ProfileScreen";
 import SettingsScreen from "@/screens/SettingsScreen";
+import ListDetailScreen from "@/screens/ListDetailScreen";
 import { useScreenOptions } from "@/hooks/useScreenOptions";
 import { useTheme } from "@/hooks/useTheme";
 
 export type ProfileStackParamList = {
   Profile: undefined;
   Settings: undefined;
+  ListDetail: { listId: string };
 };
 
 const Stack = createNativeStackNavigator<ProfileStackParamList>();
@@ -53,6 +55,14 @@ export default function ProfileStackNavigator() {
           headerTitle: "Settings",
           headerLeft: () => null,
           animation: "none",
+        }}
+      />
+      <Stack.Screen
+        name="ListDetail"
+        component={ListDetailScreen}
+        options={{
+          headerShown: false,
+          animation: "slide_from_right",
         }}
       />
     </Stack.Navigator>
