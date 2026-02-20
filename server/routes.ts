@@ -350,6 +350,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const parsed = insertPostSchema.safeParse(req.body);
       if (!parsed.success) return res.status(400).json({ message: "Dados inválidos", errors: parsed.error.errors });
       const post = await storage.createPost(userId, parsed.data);
+      if (parsed.data.isFavorite) {
+        await storage.setFavorite(userId, parsed.data.mediaType, parsed.data.mediaTitle, parsed.data.mediaId, parsed.data.mediaImage);
+      }
       res.status(201).json({ post });
     } catch (error) {
       console.error("Create post error:", error);

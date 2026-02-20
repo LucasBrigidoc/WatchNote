@@ -295,6 +295,12 @@ export default function ProfileScreen() {
                 timestamp={formatTimeAgo(post.createdAt)}
                 likeCount={post.likeCount || 0}
                 commentCount={post.commentCount || 0}
+                onMediaPress={() => navigation.navigate("MediaDetail", {
+                  id: post.mediaId,
+                  title: post.mediaTitle,
+                  imageUrl: post.mediaImage || "",
+                  type: post.mediaType,
+                })}
               />
             ))}
           </View>

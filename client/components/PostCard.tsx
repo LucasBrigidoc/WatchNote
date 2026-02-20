@@ -33,6 +33,7 @@ interface PostCardProps {
   likeCount: number;
   commentCount: number;
   onPress?: () => void;
+  onMediaPress?: () => void;
   onLike?: () => void;
   onComment?: () => void;
 }
@@ -49,6 +50,7 @@ export function PostCard({
   likeCount,
   commentCount,
   onPress,
+  onMediaPress,
   onLike,
   onComment,
 }: PostCardProps) {
@@ -91,11 +93,13 @@ export function PostCard({
         </View>
 
         <View style={styles.mediaRow}>
-          <Image
-            source={{ uri: media.imageUrl }}
-            style={styles.mediaImage}
-            contentFit="cover"
-          />
+          <Pressable onPress={onMediaPress} disabled={!onMediaPress}>
+            <Image
+              source={{ uri: media.imageUrl }}
+              style={styles.mediaImage}
+              contentFit="cover"
+            />
+          </Pressable>
           <View style={styles.mediaInfo}>
             <MediaTypeBadge type={media.type} />
             <ThemedText type="body" style={styles.mediaTitle} numberOfLines={2}>

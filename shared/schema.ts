@@ -95,7 +95,7 @@ export const insertUserSchema = createInsertSchema(users).pick({
 });
 
 export const insertFavoriteSchema = z.object({
-  category: z.enum(["film", "series", "music", "anime", "book"]),
+  category: z.enum(["film", "series", "music", "anime", "manga", "book"]),
   title: z.string().min(1),
   mediaId: z.string().optional(),
   mediaImage: z.string().optional(),

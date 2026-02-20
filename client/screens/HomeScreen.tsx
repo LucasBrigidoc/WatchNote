@@ -144,6 +144,12 @@ export default function HomeScreen() {
       timestamp={item.timestamp}
       likeCount={item.likeCount}
       commentCount={item.commentCount}
+      onMediaPress={() => navigation.navigate("MediaDetail", {
+        id: item.id,
+        title: item.media.title,
+        imageUrl: item.media.imageUrl,
+        type: item.media.type,
+      })}
     />
   );
 
