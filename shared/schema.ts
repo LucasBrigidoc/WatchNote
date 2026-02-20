@@ -89,6 +89,17 @@ export const posts = pgTable("posts", {
   uniqueIndex("posts_user_media_idx").on(table.userId, table.mediaId, table.mediaType),
 ]);
 
+export const follows = pgTable("follows", {
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  followerId: varchar("follower_id").notNull().references(() => users.id),
+  followingId: varchar("following_id").notNull().references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  uniqueIndex("follows_unique_idx").on(table.followerId, table.followingId),
+]);
+
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   email: true,
@@ -143,3 +154,4 @@ export type UserRating = typeof userRatings.$inferSelect;
 export type UserList = typeof userLists.$inferSelect;
 export type UserListItem = typeof userListItems.$inferSelect;
 export type Post = typeof posts.$inferSelect;
+export type Follow = typeof follows.$inferSelect;
