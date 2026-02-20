@@ -34,6 +34,7 @@ export interface IStorage {
   addListItem(listId: string, data: { mediaId: string; mediaType: string; mediaTitle: string; mediaImage?: string }): Promise<UserListItem>;
   removeListItem(itemId: string): Promise<void>;
 
+  findPostByUserAndMedia(userId: string, mediaId: string, mediaType: string): Promise<Post | null>;
   createPost(userId: string, data: { mediaId: string; mediaType: string; mediaTitle: string; mediaImage?: string; rating: number; comment: string; isFavorite?: boolean; firstTime?: boolean; hasSpoilers?: boolean }): Promise<Post>;
   getUserPosts(userId: string): Promise<(Post & { userName: string; userAvatar: string | null })[]>;
   getAllPosts(): Promise<(Post & { userName: string; userAvatar: string | null })[]>;
@@ -218,6 +219,13 @@ export class DatabaseStorage implements IStorage {
 
   async removeListItem(itemId: string): Promise<void> {
     await db.delete(userListItems).where(eq(userListItems.id, itemId));
+  }
+
+  async findPostByUserAndMedia(userId: string, mediaId: string, mediaType: string): Promise<Post | null> {
+    const result = await db.select().from(posts).where(
+      and(eq(posts.userId, userId), eq(posts.mediaId, mediaId), eq(posts.mediaType, mediaType))
+    );
+    return result[0] || null;
   }
 
   async createPost(userId: string, data: { mediaId: string; mediaType: string; mediaTitle: string; mediaImage?: string; rating: number; comment: string; isFavorite?: boolean; firstTime?: boolean; hasSpoilers?: boolean }): Promise<Post> {

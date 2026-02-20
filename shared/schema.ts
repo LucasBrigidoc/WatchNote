@@ -85,7 +85,9 @@ export const posts = pgTable("posts", {
   likeCount: integer("like_count").default(0),
   commentCount: integer("comment_count").default(0),
   createdAt: timestamp("created_at").defaultNow(),
-});
+}, (table) => [
+  uniqueIndex("posts_user_media_idx").on(table.userId, table.mediaId, table.mediaType),
+]);
 
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,

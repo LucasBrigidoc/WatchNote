@@ -349,7 +349,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!userId) return res.status(401).json({ message: "Não autenticado" });
       const parsed = insertPostSchema.safeParse(req.body);
       if (!parsed.success) return res.status(400).json({ message: "Dados inválidos", errors: parsed.error.errors });
+
+      const existing = await storage.findPostByUserAndMedia(userId, parsed.data.mediaId, parsed.data.mediaType);
+      if (existing) {
+        return res.status(409).json({ message: "Você já avaliou essa mídia" });
+      }
+
       const post = await storage.createPost(userId, parsed.data);
+
+      await storage.upsertRating(userId, {
+        mediaId: parsed.data.mediaId,
+        mediaType: parsed.data.mediaType,
+        mediaTitle: parsed.data.mediaTitle,
+        mediaImage: parsed.data.mediaImage,
+        rating: parsed.data.rating,
+        comment: parsed.data.comment,
+      });
+
       if (parsed.data.isFavorite) {
         await storage.setFavorite(userId, parsed.data.mediaType, parsed.data.mediaTitle, parsed.data.mediaId, parsed.data.mediaImage);
       }

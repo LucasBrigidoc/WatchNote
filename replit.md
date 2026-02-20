@@ -64,3 +64,5 @@
 - Atualizada DiscoverScreen com cards de largura total e filtros por categoria
 - Atualizada SearchScreen para usar MediaCardFull nos resultados de busca com navegação para detalhes
 - Adicionado mapeamento de gêneros TMDB (IDs para nomes em português)
+- Prevenção de posts duplicados: usuário não pode avaliar a mesma mídia duas vezes (constraint único no banco + verificação no backend)
+- Posts agora auto-atualizam avaliações (upsert em userRatings), garantindo que estatísticas do perfil refletem posts imediatamente
