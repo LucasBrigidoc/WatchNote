@@ -139,6 +139,105 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ---- Profile: Update Profile ----
+  app.put("/api/profile/update", async (req: Request, res: Response) => {
+    try {
+      const userId = getUserIdFromToken(req);
+      if (!userId) return res.status(401).json({ message: "Não autenticado" });
+      const { name, email, bio, avatarUrl } = req.body;
+
+      if (avatarUrl && avatarUrl.length > 500000) {
+        return res.status(400).json({ message: "Imagem muito grande. Use uma imagem menor." });
+      }
+
+      if (email) {
+        const existingUser = await storage.getUserByEmail(email);
+        if (existingUser && existingUser.id !== userId) {
+          return res.status(400).json({ message: "Este email já está em uso" });
+        }
+      }
+
+      if (bio !== undefined) {
+        await storage.updateUserBio(userId, bio);
+      }
+
+      const updateData: { name?: string; email?: string; avatarUrl?: string | null } = {};
+      if (name) updateData.name = name;
+      if (email) updateData.email = email;
+      if (avatarUrl !== undefined) updateData.avatarUrl = avatarUrl;
+
+      const user = await storage.updateUserProfile(userId, updateData);
+      if (!user) return res.status(404).json({ message: "Usuário não encontrado" });
+      res.json({ user: sanitizeUser(user) });
+    } catch (error) {
+      console.error("Update profile error:", error);
+      res.status(500).json({ message: "Erro ao atualizar perfil" });
+    }
+  });
+
+  // ---- Profile: Change Password ----
+  app.put("/api/profile/password", async (req: Request, res: Response) => {
+    try {
+      const userId = getUserIdFromToken(req);
+      if (!userId) return res.status(401).json({ message: "Não autenticado" });
+      const { currentPassword, newPassword } = req.body;
+
+      if (!currentPassword || !newPassword) {
+        return res.status(400).json({ message: "Senha atual e nova senha são obrigatórias" });
+      }
+      if (newPassword.length < 6) {
+        return res.status(400).json({ message: "A nova senha deve ter pelo menos 6 caracteres" });
+      }
+
+      const user = await storage.getUser(userId);
+      if (!user) return res.status(404).json({ message: "Usuário não encontrado" });
+
+      const validPassword = await bcrypt.compare(currentPassword, user.password);
+      if (!validPassword) {
+        return res.status(401).json({ message: "Senha atual incorreta" });
+      }
+
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      await storage.updateUserPassword(userId, hashedPassword);
+      res.json({ message: "Senha alterada com sucesso" });
+    } catch (error) {
+      console.error("Change password error:", error);
+      res.status(500).json({ message: "Erro ao alterar senha" });
+    }
+  });
+
+  // ---- Profile: Delete Account ----
+  app.delete("/api/profile/account", async (req: Request, res: Response) => {
+    try {
+      const userId = getUserIdFromToken(req);
+      if (!userId) return res.status(401).json({ message: "Não autenticado" });
+
+      const { password } = req.body;
+      if (!password) {
+        return res.status(400).json({ message: "Senha é obrigatória para excluir a conta" });
+      }
+
+      const user = await storage.getUser(userId);
+      if (!user) return res.status(404).json({ message: "Usuário não encontrado" });
+
+      const validPassword = await bcrypt.compare(password, user.password);
+      if (!validPassword) {
+        return res.status(401).json({ message: "Senha incorreta" });
+      }
+
+      await storage.deleteUser(userId);
+
+      for (const [token, uid] of tokens.entries()) {
+        if (uid === userId) tokens.delete(token);
+      }
+
+      res.json({ message: "Conta excluída com sucesso" });
+    } catch (error) {
+      console.error("Delete account error:", error);
+      res.status(500).json({ message: "Erro ao excluir conta" });
+    }
+  });
+
   // ---- Favorites ----
   app.get("/api/profile/favorites", async (req: Request, res: Response) => {
     try {

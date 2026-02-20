@@ -7,6 +7,8 @@ import { Feather } from "@expo/vector-icons";
 
 import ProfileScreen from "@/screens/ProfileScreen";
 import SettingsScreen from "@/screens/SettingsScreen";
+import EditProfileScreen from "@/screens/EditProfileScreen";
+import ChangePasswordScreen from "@/screens/ChangePasswordScreen";
 import ListDetailScreen from "@/screens/ListDetailScreen";
 import MediaDetailScreen, { MediaDetailParams } from "@/screens/MediaDetailScreen";
 import UserProfileScreen, { UserProfileParams } from "@/screens/UserProfileScreen";
@@ -16,6 +18,8 @@ import { useTheme } from "@/hooks/useTheme";
 export type ProfileStackParamList = {
   Profile: undefined;
   Settings: undefined;
+  EditProfile: undefined;
+  ChangePassword: undefined;
   ListDetail: { listId: string };
   MediaDetail: MediaDetailParams;
   UserProfile: UserProfileParams;
@@ -59,6 +63,22 @@ export default function ProfileStackNavigator() {
           headerTitle: "Settings",
           headerLeft: () => null,
           animation: "none",
+        }}
+      />
+      <Stack.Screen
+        name="EditProfile"
+        component={EditProfileScreen}
+        options={{
+          headerShown: false,
+          animation: "slide_from_right",
+        }}
+      />
+      <Stack.Screen
+        name="ChangePassword"
+        component={ChangePasswordScreen}
+        options={{
+          headerShown: false,
+          animation: "slide_from_right",
         }}
       />
       <Stack.Screen

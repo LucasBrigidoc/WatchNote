@@ -16,6 +16,9 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUserBio(userId: string, bio: string): Promise<User | undefined>;
+  updateUserProfile(userId: string, data: { name?: string; email?: string; avatarUrl?: string | null }): Promise<User | undefined>;
+  updateUserPassword(userId: string, newPasswordHash: string): Promise<User | undefined>;
+  deleteUser(userId: string): Promise<void>;
 
   getFavorites(userId: string): Promise<UserFavorite[]>;
   setFavorite(userId: string, category: string, title: string, mediaId?: string, mediaImage?: string): Promise<UserFavorite>;
@@ -74,6 +77,33 @@ export class DatabaseStorage implements IStorage {
   async updateUserBio(userId: string, bio: string): Promise<User | undefined> {
     const result = await db.update(users).set({ bio }).where(eq(users.id, userId)).returning();
     return result[0];
+  }
+
+  async updateUserProfile(userId: string, data: { name?: string; email?: string; avatarUrl?: string | null }): Promise<User | undefined> {
+    const updateData: any = {};
+    if (data.name !== undefined) updateData.name = data.name;
+    if (data.email !== undefined) updateData.email = data.email;
+    if (data.avatarUrl !== undefined) updateData.avatarUrl = data.avatarUrl;
+    const result = await db.update(users).set(updateData).where(eq(users.id, userId)).returning();
+    return result[0];
+  }
+
+  async updateUserPassword(userId: string, newPasswordHash: string): Promise<User | undefined> {
+    const result = await db.update(users).set({ password: newPasswordHash }).where(eq(users.id, userId)).returning();
+    return result[0];
+  }
+
+  async deleteUser(userId: string): Promise<void> {
+    await db.delete(follows).where(or(eq(follows.followerId, userId), eq(follows.followingId, userId)));
+    const userListsData = await db.select().from(userLists).where(eq(userLists.userId, userId));
+    for (const list of userListsData) {
+      await db.delete(userListItems).where(eq(userListItems.listId, list.id));
+    }
+    await db.delete(userLists).where(eq(userLists.userId, userId));
+    await db.delete(posts).where(eq(posts.userId, userId));
+    await db.delete(userRatings).where(eq(userRatings.userId, userId));
+    await db.delete(userFavorites).where(eq(userFavorites.userId, userId));
+    await db.delete(users).where(eq(users.id, userId));
   }
 
   async getFavorites(userId: string): Promise<UserFavorite[]> {

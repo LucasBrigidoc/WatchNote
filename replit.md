@@ -72,6 +72,14 @@
 - Clicar no nome do usuário em um PostCard navega para o perfil público do usuário
 - Rotas: GET /api/search/users, GET /api/search/lists, POST/DELETE /api/users/:id/follow, GET /api/users/:id/profile, GET /api/profile/follow-counts
 
+## Configurações
+- **EditProfileScreen**: Edição de nome, email, bio e foto de perfil (via expo-image-picker com base64)
+- **ChangePasswordScreen**: Alteração de senha com validação de senha atual, confirmação e mínimo 6 caracteres
+- **Exclusão de Conta**: Modal com confirmação por senha, exclui todos os dados do usuário (follows, listas, posts, avaliações, favoritos)
+- **Logout**: Botão funcional com confirmação via Alert
+- **Rotas**: PUT /api/profile/update, PUT /api/profile/password, DELETE /api/profile/account
+- **Navegação**: Settings → EditProfile, Settings → ChangePassword
+
 ## Sistema Social
 - **Follows**: Tabela `follows` (followerId, followingId) com constraint único
 - **Busca**: Pesquisa de usuários por nome/username e listas por nome
